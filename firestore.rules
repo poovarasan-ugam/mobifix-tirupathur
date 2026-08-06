@@ -3,22 +3,30 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Public product catalog — anyone can browse, only signed-in admin can edit.
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.token.email in [
+          'poovarasanking335@gmail.com',
+          'msptraderstpt@gmail.com'
+        ];
+    }
+
+    // Public product catalog — anyone can browse, only allowlisted admins can edit.
     match /products/{productId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
     }
 
-    // Repair leads — anyone can submit a booking, only signed-in admin can read/manage.
+    // Repair leads — anyone can submit a booking, only allowlisted admins can read/manage.
     match /bookings/{bookingId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null;
+      allow read, update, delete: if isAdmin();
     }
 
-    // Orders — anyone can create during checkout, only signed-in admin can read/manage.
+    // Orders — anyone can create during checkout, only allowlisted admins can read/manage.
     match /orders/{orderId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null;
+      allow read, update, delete: if isAdmin();
     }
   }
 }

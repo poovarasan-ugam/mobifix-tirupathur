@@ -2,8 +2,10 @@
 
 import { useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+
+const ADMIN_EMAILS = ["poovarasanking335@gmail.com", "msptraderstpt@gmail.com"];
 
 export default function AdminGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -11,6 +13,11 @@ export default function AdminGuard({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
+      if (u && !ADMIN_EMAILS.includes(u.email ?? "")) {
+        signOut(auth);
+        router.replace("/admin/login?denied=1");
+        return;
+      }
       setUser(u);
       if (!u) router.replace("/admin/login");
     });
