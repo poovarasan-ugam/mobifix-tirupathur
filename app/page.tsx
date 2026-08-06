@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { getProducts } from "@/lib/firestore";
+import ProductCard from "@/components/ProductCard";
+import PromoBanner from "@/components/PromoBanner";
 
 const services = [
   { code: "SCR-01", label: "Screen Replacement", desc: "Cracked or dead display, fixed on-site." },
@@ -7,7 +10,11 @@ const services = [
   { code: "CHG-04", label: "Charging Port", desc: "Loose or dead port, repaired at your door." },
 ];
 
-export default function Home() {
+export const revalidate = 60;
+
+export default async function Home() {
+  const products = await getProducts();
+  const featured = products.slice(0, 8);
   return (
     <div>
       {/* ---- Hero: styled as a filled-out job ticket ---- */}
@@ -71,6 +78,8 @@ export default function Home() {
         </div>
       </section>
 
+      <PromoBanner />
+
       {/* ---- Services grid, styled as ticket stubs ---- */}
       <section className="mx-auto max-w-6xl px-5 pb-24">
         <h2 className="font-display text-2xl font-bold mb-2">Common repairs</h2>
@@ -86,24 +95,24 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 pb-24">
-        <div className="ticket p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div>
-            <h3 className="font-display text-xl font-bold">
-              Need accessories instead?
-            </h3>
-            <p className="text-muted mt-1">
-              Cases, chargers, earphones &amp; more — delivered across Tirupathur.
-            </p>
+      {featured.length > 0 && (
+        <section className="mx-auto max-w-6xl px-5 pb-24">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-display text-2xl font-bold">Popular accessories</h2>
+            <Link href="/shop" className="text-sm font-semibold text-circuit hover:underline">
+              View all →
+            </Link>
           </div>
-          <Link
-            href="/shop"
-            className="rounded-md bg-circuit px-6 py-3 font-semibold text-white whitespace-nowrap hover:brightness-110"
-          >
-            Browse Shop
-          </Link>
-        </div>
-      </section>
+          <p className="text-muted mb-8">
+            Genuine parts &amp; accessories, delivered across Tirupathur.
+          </p>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {featured.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
