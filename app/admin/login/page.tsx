@@ -49,8 +49,8 @@ function AdminLoginForm() {
     try {
       await signInWithPopup(auth, new GoogleAuthProvider());
       router.push("/admin");
-    } catch {
-      toast.error("Google sign-in failed");
+    } catch (err: any) {
+      toast.error(`Google sign-in failed: ${err?.code ?? err?.message ?? "unknown error"}`);
     } finally {
       setLoading(false);
     }
