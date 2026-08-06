@@ -23,10 +23,22 @@ type ShopOption = { id: string; name: string };
 type ProductRow = {
   id: string;
   name: string;
+  description: string;
   price: number;
   stock: number;
+  images: string[];
+  shopId?: string;
   shopName?: string;
   costPrice?: number;
+};
+
+const EMPTY_FORM = {
+  name: "",
+  description: "",
+  price: "",
+  stock: "",
+  shopId: "",
+  costPrice: "",
 };
 
 export default function AdminProductsPage() {
@@ -39,15 +51,11 @@ export default function AdminProductsPage() {
   const [uploading, setUploading] = useState(false);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingImages, setEditingImages] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    price: "",
-    stock: "",
-    shopId: "",
-    costPrice: "",
-  });
+  const formRef = useRef<HTMLFormElement>(null);
+  const [form, setForm] = useState(EMPTY_FORM);
 
   async function loadShops() {
     const snap = await getDocs(query(collection(db, "shops"), orderBy("name")));
@@ -60,7 +68,10 @@ export default function AdminProductsPage() {
 
     const shopSnap = await getDocs(collection(db, "productShops"));
     const shopMap = new Map(
-      shopSnap.docs.map((d) => [d.id, (d.data() as any).shopName as string])
+      shopSnap.docs.map((d) => {
+        const data = d.data() as any;
+        return [d.id, { shopId: data.shopId as string, shopName: data.shopName as string }];
+      })
     );
 
     let costMap = new Map<string, number>();
@@ -72,7 +83,8 @@ export default function AdminProductsPage() {
     setProducts(
       base.map((p) => ({
         ...p,
-        shopName: shopMap.get(p.id),
+        shopId: shopMap.get(p.id)?.shopId,
+        shopName: shopMap.get(p.id)?.shopName,
         costPrice: costMap.get(p.id),
       }))
     );
@@ -97,13 +109,41 @@ export default function AdminProductsPage() {
     setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function resetForm() {
+    setForm(EMPTY_FORM);
+    photoPreviews.forEach((url) => URL.revokeObjectURL(url));
+    setPhotoFiles([]);
+    setPhotoPreviews([]);
+    setEditingId(null);
+    setEditingImages([]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function handleEditClick(p: ProductRow) {
+    setEditingId(p.id);
+    setEditingImages(p.images ?? []);
+    setForm({
+      name: p.name,
+      description: p.description ?? "",
+      price: String(p.price),
+      stock: String(p.stock),
+      shopId: p.shopId ?? "",
+      costPrice: p.costPrice != null ? String(p.costPrice) : "",
+    });
+    photoPreviews.forEach((url) => URL.revokeObjectURL(url));
+    setPhotoFiles([]);
+    setPhotoPreviews([]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
-      const productRef = doc(collection(db, "products"));
+      const productRef = editingId ? doc(db, "products", editingId) : doc(collection(db, "products"));
 
-      let imageUrls: string[] = [];
+      let imageUrls: string[] | null = null;
       if (photoFiles.length > 0) {
         setUploading(true);
         imageUrls = await Promise.all(
@@ -118,15 +158,25 @@ export default function AdminProductsPage() {
 
       const batch = writeBatch(db);
 
-      batch.set(productRef, {
-        name: form.name,
-        description: form.description,
-        price: Number(form.price),
-        stock: Number(form.stock),
-        images: imageUrls,
-        category: "general",
-        createdAt: serverTimestamp(),
-      });
+      if (editingId) {
+        batch.update(productRef, {
+          name: form.name,
+          description: form.description,
+          price: Number(form.price),
+          stock: Number(form.stock),
+          ...(imageUrls ? { images: imageUrls } : {}),
+        });
+      } else {
+        batch.set(productRef, {
+          name: form.name,
+          description: form.description,
+          price: Number(form.price),
+          stock: Number(form.stock),
+          images: imageUrls ?? [],
+          category: "general",
+          createdAt: serverTimestamp(),
+        });
+      }
 
       const shop = shops.find((s) => s.id === form.shopId);
       if (shop) {
@@ -143,15 +193,11 @@ export default function AdminProductsPage() {
       }
 
       await batch.commit();
-      toast.success("Product added");
-      setForm({ name: "", description: "", price: "", stock: "", shopId: "", costPrice: "" });
-      photoPreviews.forEach((url) => URL.revokeObjectURL(url));
-      setPhotoFiles([]);
-      setPhotoPreviews([]);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      toast.success(editingId ? "Product updated" : "Product added");
+      resetForm();
       loadProducts();
     } catch {
-      toast.error("Failed to add product");
+      toast.error(editingId ? "Failed to update product" : "Failed to add product");
     } finally {
       setLoading(false);
       setUploading(false);
@@ -167,6 +213,7 @@ export default function AdminProductsPage() {
         await deleteDoc(doc(db, "productCosts", id)).catch(() => {});
       }
       toast.success("Product removed");
+      if (editingId === id) resetForm();
       loadProducts();
     } catch {
       toast.error("Failed to remove product");
@@ -187,7 +234,16 @@ export default function AdminProductsPage() {
           : "Add products and assign the shop they were sourced from."}
       </p>
 
-      <form onSubmit={handleSubmit} className="ticket p-6 mt-4 space-y-4">
+      <form ref={formRef} onSubmit={handleSubmit} className="ticket p-6 mt-4 space-y-4">
+        {editingId && (
+          <div className="flex items-center justify-between rounded bg-surface2 px-3 py-2 text-sm">
+            <span className="text-muted">Editing an existing product</span>
+            <button type="button" onClick={resetForm} className="text-circuit font-semibold hover:underline">
+              Cancel
+            </button>
+          </div>
+        )}
+
         <input
           placeholder="Name"
           value={form.name}
@@ -260,6 +316,7 @@ export default function AdminProductsPage() {
         <div>
           <label className="text-sm text-muted">
             Photos — add {MAX_PHOTOS} for best results
+            {editingId && " (leave empty to keep existing photos)"}
           </label>
           <input
             ref={fileInputRef}
@@ -269,6 +326,21 @@ export default function AdminProductsPage() {
             onChange={handlePhotosChange}
             className="mt-1 w-full rounded border border-line bg-surface2 px-3 py-2 text-sm"
           />
+
+          {editingId && photoPreviews.length === 0 && editingImages.length > 0 && (
+            <div className="mt-3">
+              <p className="text-xs text-muted mb-2">Current photos</p>
+              <div className="flex gap-2 flex-wrap">
+                {editingImages.map((src) => (
+                  <div key={src} className="relative h-20 w-20 rounded overflow-hidden border border-line">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="Current product photo" className="h-full w-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {photoPreviews.length > 0 && (
             <div className="mt-3 flex gap-2 flex-wrap">
               {photoPreviews.map((src, i) => (
@@ -288,13 +360,32 @@ export default function AdminProductsPage() {
           )}
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-md bg-amber px-6 py-2.5 font-semibold text-ink hover:brightness-110 disabled:opacity-50"
-        >
-          {uploading ? "Uploading photos…" : loading ? "Adding…" : "Add Product"}
-        </button>
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            disabled={loading}
+            className="rounded-md bg-amber px-6 py-2.5 font-semibold text-ink transition hover:brightness-110 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0 disabled:active:scale-100"
+          >
+            {uploading
+              ? "Uploading photos…"
+              : loading
+              ? editingId
+                ? "Saving…"
+                : "Adding…"
+              : editingId
+              ? "Save Changes"
+              : "Add Product"}
+          </button>
+          {editingId && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="rounded-md border border-line px-6 py-2.5 font-semibold text-ink hover:border-circuit hover:text-circuit"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
 
       {isOwner && products.length > 0 && (
@@ -325,12 +416,20 @@ export default function AdminProductsPage() {
                   </p>
                 )}
               </div>
-              <button
-                onClick={() => handleDelete(p.id)}
-                className="text-sm text-danger hover:underline shrink-0"
-              >
-                Remove
-              </button>
+              <div className="flex gap-3 shrink-0">
+                <button
+                  onClick={() => handleEditClick(p)}
+                  className="text-sm text-circuit hover:underline"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(p.id)}
+                  className="text-sm text-danger hover:underline"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
           );
         })}
