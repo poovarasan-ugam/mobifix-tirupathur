@@ -1,7 +1,7 @@
-import { getProduct } from "@/lib/firestore";
+import { getProduct, isNewProduct } from "@/lib/firestore";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import AddToCartButton from "@/components/AddToCartButton";
+import ProductGallery from "@/components/ProductGallery";
 
 export default async function ProductPage({
   params,
@@ -13,13 +13,16 @@ export default async function ProductPage({
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-14 grid gap-10 md:grid-cols-2">
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-surface2">
-        {product.images?.[0] && (
-          <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
-        )}
-      </div>
+      <ProductGallery images={product.images} alt={product.name} />
       <div>
-        <p className="ticket-number">SKU-{product.id.slice(0, 6).toUpperCase()}</p>
+        <div className="flex items-center gap-2">
+          <p className="ticket-number">SKU-{product.id.slice(0, 6).toUpperCase()}</p>
+          {isNewProduct(product) && (
+            <span className="rounded bg-circuit px-2 py-0.5 text-[10px] font-bold tracking-wide text-white">
+              NEW
+            </span>
+          )}
+        </div>
         <h1 className="font-display text-3xl font-bold mt-2">{product.name}</h1>
         <p className="text-2xl text-amber font-mono mt-4">₹{product.price}</p>
         <p className="text-muted mt-4 leading-relaxed">{product.description}</p>

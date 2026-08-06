@@ -1,11 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
-import type { Product } from "@/lib/firestore";
+import { isNewProduct, type Product } from "@/lib/firestore";
 
 export default function ProductCard({ product }: { product: Product }) {
+  const isNew = isNewProduct(product);
+
   return (
     <Link href={`/shop/${product.id}`} className="ticket p-4 mt-4 block group">
       <div className="relative aspect-square w-full overflow-hidden rounded bg-surface2">
+        {isNew && (
+          <span className="absolute top-2 left-2 z-10 rounded bg-circuit px-2 py-0.5 text-[10px] font-bold tracking-wide text-white">
+            NEW
+          </span>
+        )}
         {product.images?.[0] && (
           <Image
             src={product.images[0]}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   collection,
   doc,
@@ -11,9 +11,12 @@ import {
   serverTimestamp,
   writeBatch,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "@/lib/firebase";
 import { useAdmin } from "@/components/AdminGuard";
 import toast from "react-hot-toast";
+
+const MAX_PHOTOS = 4;
 
 type ShopOption = { id: string; name: string };
 
@@ -33,12 +36,15 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState<ProductRow[]>([]);
   const [shops, setShops] = useState<ShopOption[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     name: "",
     description: "",
     price: "",
     stock: "",
-    image: "",
     shopId: "",
     costPrice: "",
   });
@@ -78,11 +84,38 @@ export default function AdminProductsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  function handlePhotosChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []).slice(0, MAX_PHOTOS);
+    photoPreviews.forEach((url) => URL.revokeObjectURL(url));
+    setPhotoFiles(files);
+    setPhotoPreviews(files.map((f) => URL.createObjectURL(f)));
+  }
+
+  function removePhoto(index: number) {
+    URL.revokeObjectURL(photoPreviews[index]);
+    setPhotoFiles((prev) => prev.filter((_, i) => i !== index));
+    setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
       const productRef = doc(collection(db, "products"));
+
+      let imageUrls: string[] = [];
+      if (photoFiles.length > 0) {
+        setUploading(true);
+        imageUrls = await Promise.all(
+          photoFiles.map(async (file, i) => {
+            const imgRef = ref(storage, `products/${productRef.id}/${i}-${file.name}`);
+            await uploadBytes(imgRef, file);
+            return getDownloadURL(imgRef);
+          })
+        );
+        setUploading(false);
+      }
+
       const batch = writeBatch(db);
 
       batch.set(productRef, {
@@ -90,7 +123,7 @@ export default function AdminProductsPage() {
         description: form.description,
         price: Number(form.price),
         stock: Number(form.stock),
-        images: form.image ? [form.image] : [],
+        images: imageUrls,
         category: "general",
         createdAt: serverTimestamp(),
       });
@@ -111,20 +144,17 @@ export default function AdminProductsPage() {
 
       await batch.commit();
       toast.success("Product added");
-      setForm({
-        name: "",
-        description: "",
-        price: "",
-        stock: "",
-        image: "",
-        shopId: "",
-        costPrice: "",
-      });
+      setForm({ name: "", description: "", price: "", stock: "", shopId: "", costPrice: "" });
+      photoPreviews.forEach((url) => URL.revokeObjectURL(url));
+      setPhotoFiles([]);
+      setPhotoPreviews([]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
       loadProducts();
     } catch {
       toast.error("Failed to add product");
     } finally {
       setLoading(false);
+      setUploading(false);
     }
   }
 
@@ -227,19 +257,43 @@ export default function AdminProductsPage() {
           </div>
         </div>
 
-        <input
-          placeholder="Image URL (Firebase Storage or any hosted image)"
-          value={form.image}
-          onChange={(e) => setForm({ ...form, image: e.target.value })}
-          className="w-full rounded border border-line bg-surface2 px-3 py-2"
-        />
+        <div>
+          <label className="text-sm text-muted">
+            Photos — add {MAX_PHOTOS} for best results
+          </label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handlePhotosChange}
+            className="mt-1 w-full rounded border border-line bg-surface2 px-3 py-2 text-sm"
+          />
+          {photoPreviews.length > 0 && (
+            <div className="mt-3 flex gap-2 flex-wrap">
+              {photoPreviews.map((src, i) => (
+                <div key={src} className="relative h-20 w-20 rounded overflow-hidden border border-line">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(i)}
+                    className="absolute top-0.5 right-0.5 rounded-full bg-black/60 text-white text-xs h-5 w-5 flex items-center justify-center"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         <button
           type="submit"
           disabled={loading}
           className="rounded-md bg-amber px-6 py-2.5 font-semibold text-ink hover:brightness-110 disabled:opacity-50"
         >
-          {loading ? "Adding..." : "Add Product"}
+          {uploading ? "Uploading photos…" : loading ? "Adding…" : "Add Product"}
         </button>
       </form>
 

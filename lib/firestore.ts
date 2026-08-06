@@ -18,6 +18,7 @@ export type Product = {
   images: string[];
   stock: number;
   category: string;
+  createdAt: number;
 };
 
 export type Booking = {
@@ -43,18 +44,37 @@ export type Order = {
   status: "pending" | "paid" | "failed";
 };
 
+const NEW_PRODUCT_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+export function isNewProduct(product: Product): boolean {
+  return Date.now() - product.createdAt < NEW_PRODUCT_THRESHOLD_MS;
+}
+
+function toProduct(id: string, data: any): Product {
+  return {
+    id,
+    name: data.name,
+    description: data.description,
+    price: data.price,
+    images: data.images ?? [],
+    stock: data.stock,
+    category: data.category,
+    createdAt: data.createdAt?.toMillis?.() ?? 0,
+  };
+}
+
 // ---- Products ----
 export async function getProducts(): Promise<Product[]> {
   const snap = await getDocs(
     query(collection(db, "products"), orderBy("createdAt", "desc"))
   );
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) }));
+  return snap.docs.map((d) => toProduct(d.id, d.data()));
 }
 
 export async function getProduct(id: string): Promise<Product | null> {
   const snap = await getDoc(doc(db, "products", id));
   if (!snap.exists()) return null;
-  return { id: snap.id, ...(snap.data() as Omit<Product, "id">) };
+  return toProduct(snap.id, snap.data());
 }
 
 // ---- Bookings (repair leads) ----
