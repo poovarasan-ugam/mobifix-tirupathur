@@ -8,8 +8,7 @@ export default function Navbar() {
   const count = items.reduce((sum, i) => sum + i.qty, 0);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-base/90 backdrop-blur">
-      <div className="hazard-edge" />
+    <header className="sticky top-0 z-50 border-b border-line bg-surface/95 shadow-sm backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
         <Link href="/" className="font-display text-xl font-bold tracking-tight">
           Mobi<span className="text-amber">Fix</span>
@@ -32,7 +31,7 @@ export default function Navbar() {
           >
             Cart
             {count > 0 && (
-              <span className="ml-1 rounded-full bg-amber px-1.5 py-0.5 text-xs font-bold text-base">
+              <span className="ml-1 rounded-full bg-amber px-1.5 py-0.5 text-xs font-bold text-ink">
                 {count}
               </span>
             )}

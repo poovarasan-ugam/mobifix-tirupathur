@@ -22,7 +22,7 @@ export default function RepairPage() {
       </p>
       <Link
         href="/repair/book"
-        className="mt-6 inline-block rounded-md bg-amber px-6 py-3 font-semibold text-base hover:brightness-110"
+        className="mt-6 inline-block rounded-md bg-amber px-6 py-3 font-semibold text-ink hover:brightness-110"
       >
         Book a Repair
       </Link>

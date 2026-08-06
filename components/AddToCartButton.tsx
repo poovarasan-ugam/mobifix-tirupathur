@@ -22,7 +22,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
     <button
       onClick={handleAdd}
       disabled={product.stock <= 0}
-      className="rounded-md bg-amber px-6 py-3 font-semibold text-base hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed"
+      className="rounded-md bg-amber px-6 py-3 font-semibold text-ink hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed"
     >
       Add to Cart
     </button>

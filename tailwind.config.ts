@@ -5,24 +5,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        base: "#12151C",       // near-black charcoal-blue workshop background
-        surface: "#1B2029",    // card / panel surface
-        surface2: "#232937",   // raised surface
-        line: "#2B3242",       // hairline borders
-        amber: "#F5A623",      // signal amber — hazard tape / tool accent
-        circuit: "#3ED9A4",    // circuit-board green — tech / status accent
-        ink: "#EDEEF0",        // primary text
-        muted: "#8B93A7",      // secondary text
-        danger: "#E5533D",
+        base: "#F1F3F6",       // light neutral page background
+        surface: "#FFFFFF",    // card / panel surface
+        surface2: "#F7F8FA",   // input fields / secondary surface
+        line: "#E2E5EB",       // hairline borders
+        amber: "#F5A623",      // brand accent — CTAs, price
+        circuit: "#4F46E5",    // secondary accent — links, highlights
+        ink: "#1F2937",        // primary text
+        muted: "#6B7280",      // secondary text
+        danger: "#DC2626",
       },
       fontFamily: {
         display: ["var(--font-display)"],
         body: ["var(--font-body)"],
         mono: ["var(--font-mono)"],
-      },
-      backgroundImage: {
-        "hazard-stripe":
-          "repeating-linear-gradient(45deg, #F5A623 0, #F5A623 10px, #12151C 10px, #12151C 20px)",
       },
     },
   },

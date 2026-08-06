@@ -30,7 +30,7 @@ export default function Home() {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/repair/book"
-                className="rounded-md bg-amber px-6 py-3 font-semibold text-base hover:brightness-110"
+                className="rounded-md bg-amber px-6 py-3 font-semibold text-ink hover:brightness-110"
               >
                 Book a Repair
               </Link>
@@ -98,7 +98,7 @@ export default function Home() {
           </div>
           <Link
             href="/shop"
-            className="rounded-md bg-circuit px-6 py-3 font-semibold text-base whitespace-nowrap hover:brightness-110"
+            className="rounded-md bg-circuit px-6 py-3 font-semibold text-white whitespace-nowrap hover:brightness-110"
           >
             Browse Shop
           </Link>
