@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getProducts } from "@/lib/firestore";
 import ProductCard from "@/components/ProductCard";
 import PromoBanner from "@/components/PromoBanner";
+import Reveal from "@/components/motion/Reveal";
+import Parallax from "@/components/motion/Parallax";
 
 const services = [
   { code: "SCR-01", label: "Screen Replacement", desc: "Cracked or dead display, fixed on-site." },
@@ -20,7 +22,7 @@ export default async function Home() {
       {/* ---- Hero: styled as a filled-out job ticket ---- */}
       <section className="mx-auto max-w-6xl px-5 pt-16 pb-20 md:pt-24">
         <div className="grid gap-10 md:grid-cols-2 md:items-center">
-          <div>
+          <Reveal>
             <span className="inline-block rounded-full border border-line px-3 py-1 text-xs text-circuit font-mono">
               Serving Tirupathur district
             </span>
@@ -37,44 +39,46 @@ export default async function Home() {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/repair/book"
-                className="rounded-md bg-amber px-6 py-3 font-semibold text-ink hover:brightness-110"
+                className="rounded-md bg-amber px-6 py-3 font-semibold text-ink transition hover:brightness-110 hover:-translate-y-0.5 active:scale-95"
               >
                 Book a Repair
               </Link>
               <Link
                 href="/shop"
-                className="rounded-md border border-line px-6 py-3 font-semibold text-ink hover:border-circuit hover:text-circuit"
+                className="rounded-md border border-line px-6 py-3 font-semibold text-ink transition hover:border-circuit hover:text-circuit hover:-translate-y-0.5 active:scale-95"
               >
                 Shop Accessories
               </Link>
             </div>
-          </div>
+          </Reveal>
 
           {/* the ticket itself */}
-          <div className="ticket p-6 mt-6">
-            <div className="flex items-center justify-between pt-2">
-              <span className="ticket-number">TICKET #MF-0000</span>
-              <span className="text-xs text-muted">STATUS: OPEN</span>
-            </div>
-            <div className="mt-4 space-y-3 border-t border-dashed border-line pt-4">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Service</span>
-                <span>Doorstep visit</span>
+          <Parallax strength={18}>
+            <Reveal delay={0.15} className="ticket p-6 mt-6">
+              <div className="flex items-center justify-between pt-2">
+                <span className="ticket-number">TICKET #MF-0000</span>
+                <span className="text-xs text-muted">STATUS: OPEN</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Technician</span>
-                <span>Assigned within 2 hrs</span>
+              <div className="mt-4 space-y-3 border-t border-dashed border-line pt-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted">Service</span>
+                  <span>Doorstep visit</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted">Technician</span>
+                  <span>Assigned within 2 hrs</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted">Coverage</span>
+                  <span>Tirupathur &amp; nearby</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted">Inspection</span>
+                  <span className="text-circuit">Free</span>
+                </div>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Coverage</span>
-                <span>Tirupathur &amp; nearby</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Inspection</span>
-                <span className="text-circuit">Free</span>
-              </div>
-            </div>
-          </div>
+            </Reveal>
+          </Parallax>
         </div>
       </section>
 
@@ -85,12 +89,12 @@ export default async function Home() {
         <h2 className="font-display text-2xl font-bold mb-2">Common repairs</h2>
         <p className="text-muted mb-8">Fixed pricing, quoted before we start.</p>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {services.map((s) => (
-            <div key={s.code} className="ticket p-5 mt-4">
+          {services.map((s, i) => (
+            <Reveal key={s.code} delay={i * 0.06} className="ticket p-5 mt-4">
               <p className="ticket-number">{s.code}</p>
               <p className="mt-3 font-display font-bold">{s.label}</p>
               <p className="mt-1 text-sm text-muted">{s.desc}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -107,8 +111,10 @@ export default async function Home() {
             Genuine parts &amp; accessories, delivered across Tirupathur.
           </p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {featured.map((p, i) => (
+              <Reveal key={p.id} delay={i * 0.05}>
+                <ProductCard product={p} />
+              </Reveal>
             ))}
           </div>
         </section>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Reveal from "@/components/motion/Reveal";
 
 const steps = [
   { n: "01", label: "Book online", desc: "Tell us the issue, your address, and a preferred time." },
@@ -22,18 +23,18 @@ export default function RepairPage() {
       </p>
       <Link
         href="/repair/book"
-        className="mt-6 inline-block rounded-md bg-amber px-6 py-3 font-semibold text-ink hover:brightness-110"
+        className="mt-6 inline-block rounded-md bg-amber px-6 py-3 font-semibold text-ink transition hover:brightness-110 hover:-translate-y-0.5 active:scale-95"
       >
         Book a Repair
       </Link>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mt-14">
-        {steps.map((s) => (
-          <div key={s.n} className="ticket p-5 mt-4">
+        {steps.map((s, i) => (
+          <Reveal key={s.n} delay={i * 0.06} className="ticket p-5 mt-4">
             <p className="ticket-number">STEP {s.n}</p>
             <p className="mt-3 font-display font-bold">{s.label}</p>
             <p className="mt-1 text-sm text-muted">{s.desc}</p>
-          </div>
+          </Reveal>
         ))}
       </div>
     </div>

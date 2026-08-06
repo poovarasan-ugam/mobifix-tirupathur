@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
@@ -30,11 +31,20 @@ export default function Navbar() {
             className="relative text-sm font-medium text-ink hover:text-amber"
           >
             Cart
-            {count > 0 && (
-              <span className="ml-1 rounded-full bg-amber px-1.5 py-0.5 text-xs font-bold text-ink">
-                {count}
-              </span>
-            )}
+            <AnimatePresence>
+              {count > 0 && (
+                <motion.span
+                  key={count}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.5, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                  className="ml-1 inline-block rounded-full bg-amber px-1.5 py-0.5 text-xs font-bold text-ink"
+                >
+                  {count}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </Link>
         </div>
       </nav>

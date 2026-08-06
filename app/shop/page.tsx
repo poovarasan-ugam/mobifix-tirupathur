@@ -1,5 +1,6 @@
 import { getProducts } from "@/lib/firestore";
 import ProductCard from "@/components/ProductCard";
+import Reveal from "@/components/motion/Reveal";
 
 export const revalidate = 60; // re-fetch products every 60s
 
@@ -19,8 +20,10 @@ export default async function ShopPage() {
         </p>
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 mt-10">
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} />
+          {products.map((p, i) => (
+            <Reveal key={p.id} delay={(i % 4) * 0.05}>
+              <ProductCard product={p} />
+            </Reveal>
           ))}
         </div>
       )}

@@ -121,7 +121,7 @@ export default function BookingForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-md bg-amber px-6 py-3 font-semibold text-ink hover:brightness-110 disabled:opacity-50"
+        className="w-full rounded-md bg-amber px-6 py-3 font-semibold text-ink transition hover:brightness-110 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0 disabled:active:scale-100"
       >
         {loading ? "Submitting..." : "Book Repair — Free Inspection"}
       </button>
