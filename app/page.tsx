@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getProducts } from "@/lib/firestore";
 import ProductCard from "@/components/ProductCard";
 import PromoBanner from "@/components/PromoBanner";
@@ -21,10 +22,30 @@ const categories = [
 const brands = ["Samsung", "Apple", "Xiaomi", "Vivo", "Oppo", "Realme", "OnePlus", "Motorola"];
 
 const whyUs = [
-  { icon: "doorstep" as const, label: "Doorstep Service", desc: "We come to you — no shop visit needed." },
-  { icon: "certified" as const, label: "Certified Technicians", desc: "Trained specialists, not guesswork." },
-  { icon: "inspection" as const, label: "Free Inspection", desc: "Know the cost before we start any work." },
-  { icon: "genuine" as const, label: "Genuine Accessories", desc: "Real parts and products, not knockoffs." },
+  {
+    icon: "doorstep" as const,
+    label: "Doorstep Service",
+    desc: "No need to visit a shop or wait in line. Our technician comes straight to your home or office with all the tools and parts needed, so your day isn't interrupted.",
+    image: "https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=800&q=80&auto=format&fit=crop",
+  },
+  {
+    icon: "certified" as const,
+    label: "Certified Technicians",
+    desc: "Every repair is handled by a trained specialist who knows your device inside out — not a guess-and-check job. You get it fixed right the first time.",
+    image: "https://images.unsplash.com/photo-1611396000732-f8c9a933424f?w=800&q=80&auto=format&fit=crop",
+  },
+  {
+    icon: "inspection" as const,
+    label: "Free Inspection",
+    desc: "Before any work begins, we run a full diagnostic and give you a clear, fixed quote. No surprise charges, no pressure to say yes.",
+    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80&auto=format&fit=crop",
+  },
+  {
+    icon: "genuine" as const,
+    label: "Genuine Accessories",
+    desc: "Every case, charger, and part we sell or fit is genuine — never a cheap knockoff that fails in a few weeks.",
+    image: "https://images.unsplash.com/photo-1573739022854-abceaeb585dc?w=800&q=80&auto=format&fit=crop",
+  },
 ];
 
 const bookingSteps = [
@@ -154,14 +175,19 @@ export default async function Home() {
       <section className="mx-auto max-w-6xl px-5 pb-24">
         <h2 className="font-display text-2xl font-bold mb-2">Why choose MobiFix</h2>
         <p className="text-muted mb-8">What you get with every visit.</p>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {whyUs.map((f, i) => (
-            <Reveal key={f.label} delay={i * 0.06} className="ticket p-5 mt-4">
-              <div className="h-11 w-11 rounded-full bg-amber/15 text-amber flex items-center justify-center">
-                <FeatureIcon kind={f.icon} />
+            <Reveal key={f.label} delay={i * 0.06} className="ticket mt-4">
+              <div className="relative aspect-[4/3] w-full bg-surface2">
+                <Image src={f.image} alt={f.label} fill className="object-cover" />
+                <div className="absolute -bottom-5 left-4 h-11 w-11 rounded-full bg-amber/15 text-amber flex items-center justify-center ring-4 ring-surface">
+                  <FeatureIcon kind={f.icon} />
+                </div>
               </div>
-              <p className="mt-3 font-display font-bold">{f.label}</p>
-              <p className="mt-1 text-sm text-muted">{f.desc}</p>
+              <div className="p-5 pt-7">
+                <p className="font-display font-bold">{f.label}</p>
+                <p className="mt-1.5 text-sm text-muted leading-relaxed">{f.desc}</p>
+              </div>
             </Reveal>
           ))}
         </div>
