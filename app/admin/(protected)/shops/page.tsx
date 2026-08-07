@@ -12,11 +12,27 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAdmin } from "@/components/AdminGuard";
 import toast from "react-hot-toast";
 
 type ShopRow = { id: string; name: string; phone?: string; address?: string };
 
 export default function AdminShopsPage() {
+  const { permissions } = useAdmin();
+
+  if (!permissions.shops) {
+    return (
+      <div className="mx-auto max-w-2xl px-5 py-14">
+        <h1 className="font-display text-3xl font-bold mb-2">Shops</h1>
+        <p className="text-muted">You don&apos;t have access to this section.</p>
+      </div>
+    );
+  }
+
+  return <ShopsManager />;
+}
+
+function ShopsManager() {
   const [shops, setShops] = useState<ShopRow[]>([]);
   const [form, setForm] = useState({ name: "", phone: "", address: "" });
   const [loading, setLoading] = useState(false);

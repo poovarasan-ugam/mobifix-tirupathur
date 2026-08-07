@@ -7,8 +7,9 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 
 export type AdminRole = "owner" | "subadmin";
+export type AdminPermissions = { products: boolean; shops: boolean; bookings: boolean };
 
-type AdminContextType = { user: User; role: AdminRole };
+type AdminContextType = { user: User; role: AdminRole; permissions: AdminPermissions };
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
@@ -37,8 +38,18 @@ export default function AdminGuard({ children }: { children: ReactNode }) {
           router.replace("/admin/login?denied=1");
           return;
         }
-        const role = (snap.data().role as AdminRole) === "owner" ? "owner" : "subadmin";
-        setState({ user: u, role });
+        const data = snap.data();
+        const role: AdminRole = data.role === "owner" ? "owner" : "subadmin";
+        const perms = data.permissions ?? {};
+        const permissions: AdminPermissions =
+          role === "owner"
+            ? { products: true, shops: true, bookings: true }
+            : {
+                products: perms.products ?? true,
+                shops: perms.shops ?? true,
+                bookings: perms.bookings ?? true,
+              };
+        setState({ user: u, role, permissions });
       } catch {
         await signOut(auth);
         setState(null);

@@ -3,34 +3,44 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function adminDoc() {
+      return get(/databases/$(database)/documents/admins/$(request.auth.token.email)).data;
+    }
+
     function isAdmin() {
       return request.auth != null &&
         exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
     }
 
     function isOwner() {
-      return request.auth != null &&
-        get(/databases/$(database)/documents/admins/$(request.auth.token.email)).data.role == 'owner';
+      return request.auth != null && adminDoc().role == 'owner';
+    }
+
+    // Owner always has full access. Sub-admins need the named permission
+    // explicitly set to true; missing permissions map/key defaults to true
+    // so existing sub-admins keep access until the owner narrows it.
+    function hasPermission(area) {
+      return request.auth != null && isAdmin() &&
+        (isOwner() || adminDoc().get('permissions', {}).get(area, true) == true);
     }
 
     // Admin directory — every admin can read their own record (to learn their
-    // role), but only the owner can list everyone or add/remove admins.
+    // role/permissions), but only the owner can list everyone or add/remove/edit admins.
     match /admins/{email} {
       allow get: if request.auth != null && request.auth.token.email == email;
       allow list: if isOwner();
       allow write: if isOwner();
     }
 
-    // Public product catalog — anyone can browse, any admin can edit.
+    // Public product catalog — anyone can browse, admins with "products" permission can edit.
     match /products/{productId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if hasPermission('products');
     }
 
-    // Which shop a product was sourced from — internal, not public, but not
-    // money either, so any admin can see/manage it.
+    // Which shop a product was sourced from — tied to the "products" permission.
     match /productShops/{productId} {
-      allow read, write: if isAdmin();
+      allow read, write: if hasPermission('products');
     }
 
     // Shop cost / margin — owner-only, never exposed to sub-admins or the public.
@@ -38,15 +48,15 @@ service cloud.firestore {
       allow read, write: if isOwner();
     }
 
-    // Supplier directory.
+    // Supplier directory — its own "shops" permission.
     match /shops/{shopId} {
-      allow read, write: if isAdmin();
+      allow read, write: if hasPermission('shops');
     }
 
-    // Repair leads — anyone can submit a booking, any admin can read/manage.
+    // Repair leads — anyone can submit a booking, admins with "bookings" permission can manage.
     match /bookings/{bookingId} {
       allow create: if true;
-      allow read, update, delete: if isAdmin();
+      allow read, update, delete: if hasPermission('bookings');
     }
 
     // Orders — anyone can create during checkout, any admin can read/manage.

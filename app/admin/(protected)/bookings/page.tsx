@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAdmin } from "@/components/AdminGuard";
 
 type BookingRow = {
   id: string;
@@ -16,6 +17,21 @@ type BookingRow = {
 };
 
 export default function AdminBookingsPage() {
+  const { permissions } = useAdmin();
+
+  if (!permissions.bookings) {
+    return (
+      <div className="mx-auto max-w-4xl px-5 py-14">
+        <h1 className="font-display text-3xl font-bold mb-2">Repair Bookings</h1>
+        <p className="text-muted">You don&apos;t have access to this section.</p>
+      </div>
+    );
+  }
+
+  return <BookingsManager />;
+}
+
+function BookingsManager() {
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [loading, setLoading] = useState(true);
 

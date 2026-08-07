@@ -44,6 +44,21 @@ const EMPTY_FORM = {
 };
 
 export default function AdminProductsPage() {
+  const { permissions } = useAdmin();
+
+  if (!permissions.products) {
+    return (
+      <div className="mx-auto max-w-4xl px-5 py-14">
+        <h1 className="font-display text-3xl font-bold mb-2">Products</h1>
+        <p className="text-muted">You don&apos;t have access to this section.</p>
+      </div>
+    );
+  }
+
+  return <ProductsManager />;
+}
+
+function ProductsManager() {
   const { role } = useAdmin();
   const isOwner = role === "owner";
 
