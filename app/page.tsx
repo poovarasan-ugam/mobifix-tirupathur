@@ -63,7 +63,6 @@ export default async function Home() {
   const featured = products.slice(0, 8);
   return (
     <div>
-      {/* ---- Hero: styled as a filled-out job ticket ---- */}
       <section className="mx-auto max-w-6xl px-5 pt-16 pb-14 md:pt-24">
         <div className="grid gap-10 md:grid-cols-2 md:items-center">
           <Reveal>
@@ -96,29 +95,34 @@ export default async function Home() {
             </div>
           </Reveal>
 
-          {/* the ticket itself */}
+          {/* hero visual */}
           <Parallax strength={18}>
-            <Reveal delay={0.15} className="ticket p-6 mt-6">
-              <div className="flex items-center justify-between pt-2">
-                <span className="ticket-number">TICKET #MF-0000</span>
-                <span className="text-xs text-muted">STATUS: OPEN</span>
-              </div>
-              <div className="mt-4 space-y-3 border-t border-dashed border-line pt-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted">Service</span>
-                  <span>Doorstep visit</span>
+            <Reveal delay={0.15} className="relative mt-6">
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-xl">
+                <Image
+                  src="https://images.unsplash.com/photo-1639776738932-956082f0b704?w=1200&q=80&auto=format&fit=crop"
+                  alt="Technician repairing a smartphone"
+                  fill
+                  priority
+                  className="object-cover"
+                />
+                <div className="absolute top-4 right-4 ticket px-4 py-2.5 flex items-center gap-2.5 shadow-lg">
+                  <span className="h-8 w-8 shrink-0 rounded-full bg-circuit/10 text-circuit flex items-center justify-center">
+                    <FeatureIcon kind="doorstep" className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <p className="text-xs font-semibold leading-none">Doorstep Service</p>
+                    <p className="text-[11px] text-muted mt-1">We come to you</p>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted">Technician</span>
-                  <span>Assigned within 2 hrs</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted">Coverage</span>
-                  <span>Tirupathur &amp; nearby</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted">Inspection</span>
-                  <span className="text-circuit">Free</span>
+                <div className="absolute bottom-4 left-4 ticket px-4 py-2.5 flex items-center gap-2.5 shadow-lg">
+                  <span className="h-8 w-8 shrink-0 rounded-full bg-amber/15 text-amber flex items-center justify-center">
+                    <FeatureIcon kind="genuine" className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <p className="text-xs font-semibold leading-none">Genuine Parts</p>
+                    <p className="text-[11px] text-muted mt-1">Never knockoffs</p>
+                  </div>
                 </div>
               </div>
             </Reveal>
