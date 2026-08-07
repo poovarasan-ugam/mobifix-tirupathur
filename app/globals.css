@@ -10,6 +10,15 @@
 
 body {
   background-color: #f1f3f6;
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.025) 1px, transparent 1px),
+    radial-gradient(circle at 15% 20%, rgba(79, 70, 229, 0.08), transparent 32%),
+    radial-gradient(circle at 85% 15%, rgba(245, 166, 35, 0.08), transparent 30%),
+    radial-gradient(circle at 50% 95%, rgba(59, 130, 246, 0.06), transparent 38%),
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 45%, #f1f3f6 100%);
+  background-size: 40px 40px, 40px 40px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat;
   color: #1f2937;
   font-family: var(--font-body);
 }
