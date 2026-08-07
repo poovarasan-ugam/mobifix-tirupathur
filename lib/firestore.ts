@@ -100,3 +100,47 @@ export async function createOrder(order: Order) {
     createdAt: serverTimestamp(),
   });
 }
+
+// ---- Testimonials ----
+export type Testimonial = {
+  id: string;
+  customerName: string;
+  location: string;
+  device: string;
+  service: string;
+  rating: number;
+  quote: string;
+  createdAt: number;
+};
+
+export async function getTestimonials(): Promise<Testimonial[]> {
+  const snap = await getDocs(
+    query(collection(db, "testimonials"), orderBy("createdAt", "desc"))
+  );
+  return snap.docs.map((d) => {
+    const data = d.data() as any;
+    return {
+      id: d.id,
+      customerName: data.customerName,
+      location: data.location,
+      device: data.device,
+      service: data.service,
+      rating: data.rating,
+      quote: data.quote,
+      createdAt: data.createdAt?.toMillis?.() ?? 0,
+    };
+  });
+}
+
+export function relativeTime(ms: number): string {
+  const days = Math.floor((Date.now() - ms) / (24 * 60 * 60 * 1000));
+  if (days <= 0) return "today";
+  if (days === 1) return "1 day ago";
+  if (days < 7) return `${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks === 1) return "1 week ago";
+  if (weeks < 5) return `${weeks} weeks ago`;
+  const months = Math.floor(days / 30);
+  if (months <= 1) return "1 month ago";
+  return `${months} months ago`;
+}

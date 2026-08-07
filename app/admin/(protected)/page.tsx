@@ -48,6 +48,12 @@ export default function AdminPage() {
           </Link>
         )}
         {role === "owner" && (
+          <Link href="/admin/testimonials" className="ticket p-6 mt-4 block hover:border-circuit">
+            <p className="font-display font-bold text-lg">Testimonials</p>
+            <p className="text-sm text-muted mt-1">Add real customer reviews to show on the site</p>
+          </Link>
+        )}
+        {role === "owner" && (
           <Link href="/admin/admins" className="ticket p-6 mt-4 block hover:border-circuit">
             <p className="font-display font-bold text-lg">Sub-Admins</p>
             <p className="text-sm text-muted mt-1">Add or remove admin access for others</p>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getProducts } from "@/lib/firestore";
+import { getProducts, getTestimonials } from "@/lib/firestore";
 import ProductCard from "@/components/ProductCard";
 import PromoBanner from "@/components/PromoBanner";
 import Reveal from "@/components/motion/Reveal";
@@ -8,6 +8,7 @@ import Parallax from "@/components/motion/Parallax";
 import RepairIcon from "@/components/RepairIcon";
 import FeatureIcon from "@/components/FeatureIcon";
 import SearchBar from "@/components/SearchBar";
+import Testimonials from "@/components/Testimonials";
 
 const categories = [
   { icon: "screen" as const, label: "Screen Replacement", href: "/repair/book", color: "#F5A623" },
@@ -61,6 +62,7 @@ export const revalidate = 60;
 export default async function Home() {
   const products = await getProducts();
   const featured = products.slice(0, 8);
+  const testimonials = await getTestimonials();
   return (
     <div>
       <section className="mx-auto max-w-6xl px-5 pt-16 pb-14 md:pt-24">
@@ -237,6 +239,8 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      <Testimonials testimonials={testimonials} />
 
       {/* ---- Coverage ---- */}
       <section className="mx-auto max-w-6xl px-5 pb-24">
