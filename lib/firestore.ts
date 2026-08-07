@@ -15,6 +15,7 @@ export type Product = {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
   images: string[];
   stock: number;
   category: string;
@@ -50,12 +51,18 @@ export function isNewProduct(product: Product): boolean {
   return Date.now() - product.createdAt < NEW_PRODUCT_THRESHOLD_MS;
 }
 
+export function discountPercent(product: Product): number | null {
+  if (!product.originalPrice || product.originalPrice <= product.price) return null;
+  return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+}
+
 function toProduct(id: string, data: any): Product {
   return {
     id,
     name: data.name,
     description: data.description,
     price: data.price,
+    originalPrice: data.originalPrice ?? undefined,
     images: data.images ?? [],
     stock: data.stock,
     category: data.category,

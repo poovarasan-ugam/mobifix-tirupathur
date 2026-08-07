@@ -25,6 +25,7 @@ type ProductRow = {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
   stock: number;
   images: string[];
   shopId?: string;
@@ -35,6 +36,7 @@ type ProductRow = {
 const EMPTY_FORM = {
   name: "",
   description: "",
+  originalPrice: "",
   price: "",
   stock: "",
   shopId: "",
@@ -125,6 +127,7 @@ export default function AdminProductsPage() {
     setForm({
       name: p.name,
       description: p.description ?? "",
+      originalPrice: p.originalPrice != null ? String(p.originalPrice) : "",
       price: String(p.price),
       stock: String(p.stock),
       shopId: p.shopId ?? "",
@@ -163,6 +166,7 @@ export default function AdminProductsPage() {
           name: form.name,
           description: form.description,
           price: Number(form.price),
+          originalPrice: form.originalPrice ? Number(form.originalPrice) : null,
           stock: Number(form.stock),
           ...(imageUrls ? { images: imageUrls } : {}),
         });
@@ -171,6 +175,7 @@ export default function AdminProductsPage() {
           name: form.name,
           description: form.description,
           price: Number(form.price),
+          originalPrice: form.originalPrice ? Number(form.originalPrice) : null,
           stock: Number(form.stock),
           images: imageUrls ?? [],
           category: "general",
@@ -279,9 +284,19 @@ export default function AdminProductsPage() {
           )}
         </div>
 
-        <div className={`grid gap-4 ${isOwner ? "grid-cols-3" : "grid-cols-2"}`}>
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-sm text-muted">Publish price (₹)</label>
+            <label className="text-sm text-muted">Original price (₹)</label>
+            <input
+              type="number"
+              value={form.originalPrice}
+              onChange={(e) => setForm({ ...form, originalPrice: e.target.value })}
+              placeholder="Optional — shown crossed out"
+              className="mt-1 w-full rounded border border-line bg-surface2 px-3 py-2"
+            />
+          </div>
+          <div>
+            <label className="text-sm text-muted">Selling price (₹)</label>
             <input
               type="number"
               value={form.price}
@@ -409,7 +424,12 @@ export default function AdminProductsPage() {
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <p className="font-mono text-amber">₹{p.price}</p>
+                <p className="font-mono">
+                  {p.originalPrice != null && p.originalPrice > p.price && (
+                    <span className="text-muted line-through mr-1.5">₹{p.originalPrice}</span>
+                  )}
+                  <span className="text-amber">₹{p.price}</span>
+                </p>
                 {isOwner && (
                   <p className="text-xs text-muted mt-1">
                     {p.costPrice != null ? `Cost ₹${p.costPrice} · Profit ₹${profit}` : "No cost set"}
