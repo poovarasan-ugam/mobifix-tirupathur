@@ -5,15 +5,35 @@ import PromoBanner from "@/components/PromoBanner";
 import Reveal from "@/components/motion/Reveal";
 import Parallax from "@/components/motion/Parallax";
 import RepairIcon from "@/components/RepairIcon";
+import FeatureIcon from "@/components/FeatureIcon";
+import SearchBar from "@/components/SearchBar";
 
-const services = [
-  { code: "SCR-01", icon: "screen" as const, label: "Screen Replacement", desc: "Cracked or dead display, fixed on-site." },
-  { code: "BAT-02", icon: "battery" as const, label: "Battery Replacement", desc: "Draining fast? Swapped in under 30 min." },
-  { code: "WTR-03", icon: "water" as const, label: "Water Damage", desc: "Diagnosis & board-level cleaning." },
-  { code: "CHG-04", icon: "charging" as const, label: "Charging Port", desc: "Loose or dead port, repaired at your door." },
+const categories = [
+  { icon: "screen" as const, label: "Screen Replacement", href: "/repair/book", color: "#F5A623" },
+  { icon: "battery" as const, label: "Battery", href: "/repair/book", color: "#10B981" },
+  { icon: "charging" as const, label: "Charging Port", href: "/repair/book", color: "#4F46E5" },
+  { icon: "water" as const, label: "Water Damage", href: "/repair/book", color: "#06B6D4" },
+  { icon: "camera" as const, label: "Camera", href: "/repair/book", color: "#8B5CF6" },
+  { icon: "software" as const, label: "Software Issues", href: "/repair/book", color: "#F97316" },
+  { icon: "accessories" as const, label: "Accessories", href: "/shop", color: "#EC4899" },
 ];
 
 const brands = ["Samsung", "Apple", "Xiaomi", "Vivo", "Oppo", "Realme", "OnePlus", "Motorola"];
+
+const whyUs = [
+  { icon: "doorstep" as const, label: "Doorstep Service", desc: "We come to you — no shop visit needed." },
+  { icon: "certified" as const, label: "Certified Technicians", desc: "Trained specialists, not guesswork." },
+  { icon: "inspection" as const, label: "Free Inspection", desc: "Know the cost before we start any work." },
+  { icon: "genuine" as const, label: "Genuine Accessories", desc: "Real parts and products, not knockoffs." },
+];
+
+const bookingSteps = [
+  { label: "Book Online", desc: "Tell us the issue and pick a time." },
+  { label: "Technician Assigned", desc: "Confirmed within 2 hours." },
+  { label: "Doorstep Visit", desc: "We arrive fully equipped." },
+  { label: "Repair Completed", desc: "Most fixes done in 30–45 min." },
+  { label: "Payment", desc: "Pay only after you approve." },
+];
 
 export const revalidate = 60;
 
@@ -23,7 +43,7 @@ export default async function Home() {
   return (
     <div>
       {/* ---- Hero: styled as a filled-out job ticket ---- */}
-      <section className="mx-auto max-w-6xl px-5 pt-16 pb-20 md:pt-24">
+      <section className="mx-auto max-w-6xl px-5 pt-16 pb-14 md:pt-24">
         <div className="grid gap-10 md:grid-cols-2 md:items-center">
           <Reveal>
             <span className="inline-block rounded-full border border-line px-3 py-1 text-xs text-circuit font-mono">
@@ -85,16 +105,18 @@ export default async function Home() {
         </div>
       </section>
 
+      <SearchBar />
+
       {/* ---- Brand trust strip ---- */}
       <Reveal className="mx-auto max-w-6xl px-5 pb-16">
         <p className="text-center text-xs uppercase tracking-wider text-muted mb-5">
           We repair all major brands
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+        <div className="flex flex-wrap items-center justify-center gap-3">
           {brands.map((b) => (
             <span
               key={b}
-              className="font-display text-lg font-bold text-muted/70 transition hover:text-ink"
+              className="rounded-lg border border-line bg-surface px-5 py-2.5 font-display text-sm font-bold text-muted transition hover:-translate-y-0.5 hover:border-circuit hover:text-circuit hover:shadow-md"
             >
               {b}
             </span>
@@ -104,21 +126,64 @@ export default async function Home() {
 
       <PromoBanner />
 
-      {/* ---- Services grid, styled as ticket stubs ---- */}
+      {/* ---- Category grid ---- */}
       <section className="mx-auto max-w-6xl px-5 pb-24">
-        <h2 className="font-display text-2xl font-bold mb-2">Common repairs</h2>
-        <p className="text-muted mb-8">Fixed pricing, quoted before we start.</p>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {services.map((s, i) => (
-            <Reveal key={s.code} delay={i * 0.06} className="ticket p-5 mt-4">
-              <div className="h-11 w-11 rounded-full bg-circuit/10 text-circuit flex items-center justify-center">
-                <RepairIcon kind={s.icon} />
-              </div>
-              <p className="ticket-number mt-3">{s.code}</p>
-              <p className="mt-2 font-display font-bold">{s.label}</p>
-              <p className="mt-1 text-sm text-muted">{s.desc}</p>
+        <h2 className="font-display text-2xl font-bold mb-2">What do you need?</h2>
+        <p className="text-muted mb-8">Pick a category to get started — fixed pricing, quoted before we start.</p>
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+          {categories.map((c, i) => (
+            <Reveal key={c.label} delay={i * 0.05}>
+              <Link
+                href={c.href}
+                className="flex flex-col items-center gap-3 rounded-xl border border-line bg-surface p-5 text-center transition hover:-translate-y-1 hover:shadow-lg hover:border-transparent"
+              >
+                <div
+                  className="flex h-14 w-14 items-center justify-center rounded-full"
+                  style={{ backgroundColor: `${c.color}1A`, color: c.color }}
+                >
+                  <RepairIcon kind={c.icon} />
+                </div>
+                <p className="font-display font-semibold text-sm">{c.label}</p>
+              </Link>
             </Reveal>
           ))}
+        </div>
+      </section>
+
+      {/* ---- Why choose MobiFix ---- */}
+      <section className="mx-auto max-w-6xl px-5 pb-24">
+        <h2 className="font-display text-2xl font-bold mb-2">Why choose MobiFix</h2>
+        <p className="text-muted mb-8">What you get with every visit.</p>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {whyUs.map((f, i) => (
+            <Reveal key={f.label} delay={i * 0.06} className="ticket p-5 mt-4">
+              <div className="h-11 w-11 rounded-full bg-amber/15 text-amber flex items-center justify-center">
+                <FeatureIcon kind={f.icon} />
+              </div>
+              <p className="mt-3 font-display font-bold">{f.label}</p>
+              <p className="mt-1 text-sm text-muted">{f.desc}</p>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ---- Booking process timeline ---- */}
+      <section className="mx-auto max-w-6xl px-5 pb-24">
+        <h2 className="font-display text-2xl font-bold mb-2">How booking works</h2>
+        <p className="text-muted mb-10">From tap to fixed, in five steps.</p>
+        <div className="relative">
+          <div className="hidden md:block absolute top-6 left-[10%] right-[10%] h-0.5 bg-line" />
+          <div className="grid gap-8 md:grid-cols-5">
+            {bookingSteps.map((s, i) => (
+              <Reveal key={s.label} delay={i * 0.08} className="relative flex flex-col items-center text-center">
+                <div className="h-12 w-12 rounded-full bg-circuit text-white flex items-center justify-center font-display font-bold relative z-10">
+                  {i + 1}
+                </div>
+                <p className="mt-3 font-semibold text-sm">{s.label}</p>
+                <p className="mt-1 text-xs text-muted">{s.desc}</p>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -142,6 +207,58 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      {/* ---- Coverage ---- */}
+      <section className="mx-auto max-w-6xl px-5 pb-24">
+        <Reveal className="ticket p-8 md:p-10 grid gap-8 md:grid-cols-2 md:items-center">
+          <div>
+            <span className="ticket-number">SERVICE AREA</span>
+            <h2 className="mt-2 font-display text-2xl font-bold">Currently serving Tirupathur &amp; nearby areas</h2>
+            <p className="mt-3 text-muted">
+              Our technicians cover Tirupathur town and the surrounding
+              district. Tell us your locality when you book — we&apos;ll
+              confirm coverage and an arrival time.
+            </p>
+            <Link
+              href="/repair/book"
+              className="mt-6 inline-block rounded-md border border-line px-5 py-2.5 font-semibold text-sm text-ink transition hover:border-circuit hover:text-circuit"
+            >
+              Check availability →
+            </Link>
+          </div>
+          <div className="flex items-center justify-center">
+            <svg viewBox="0 0 200 160" width="220" height="176" className="text-circuit">
+              <circle cx="100" cy="90" r="55" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.15" />
+              <circle cx="100" cy="90" r="38" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.25" />
+              <circle cx="100" cy="90" r="21" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.35" />
+              <path
+                d="M100 55 C112 55 121 64 121 76 C121 92 100 116 100 116 C100 116 79 92 79 76 C79 64 88 55 100 55 Z"
+                fill="currentColor"
+              />
+              <circle cx="100" cy="75" r="7" fill="white" />
+            </svg>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* ---- CTA banner ---- */}
+      <section className="mx-auto max-w-6xl px-5 pb-24">
+        <Reveal
+          className="rounded-2xl p-10 md:p-14 text-center"
+          style={{ background: "linear-gradient(135deg, #F5A623, #4F46E5)" }}
+        >
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-white">
+            Need your phone fixed today?
+          </h2>
+          <p className="mt-2 text-white/90">Book a technician in under 2 minutes.</p>
+          <Link
+            href="/repair/book"
+            className="mt-6 inline-block rounded-md bg-white px-8 py-3 font-semibold text-ink transition hover:brightness-95 hover:-translate-y-0.5 active:scale-95"
+          >
+            Book Now
+          </Link>
+        </Reveal>
+      </section>
     </div>
   );
 }

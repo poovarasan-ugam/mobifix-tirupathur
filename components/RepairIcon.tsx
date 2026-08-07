@@ -20,13 +20,32 @@ const paths: Record<string, JSX.Element> = {
       <path d="M23 12 L27 12 M23 15.5 L27 15.5 M23 19 L27 19" strokeLinecap="round" opacity="0.55" />
     </>
   ),
+  camera: (
+    <>
+      <rect x="4" y="10" width="24" height="16" rx="3" />
+      <path d="M11 10 L13 6 L19 6 L21 10" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="16" cy="18" r="5" />
+    </>
+  ),
+  software: (
+    <>
+      <circle cx="16" cy="16" r="4.5" />
+      <path d="M16 4 L16 8 M16 24 L16 28 M4 16 L8 16 M24 16 L28 16 M7.5 7.5 L10.3 10.3 M21.7 21.7 L24.5 24.5 M24.5 7.5 L21.7 10.3 M10.3 21.7 L7.5 24.5" strokeLinecap="round" />
+    </>
+  ),
+  accessories: (
+    <>
+      <path d="M9 11 L9 8 a5 5 0 0 1 10 0 L19 11" strokeLinecap="round" />
+      <rect x="5" y="11" width="18" height="16" rx="3" />
+    </>
+  ),
 };
 
 export default function RepairIcon({
   kind,
   className,
 }: {
-  kind: "screen" | "battery" | "water" | "charging";
+  kind: "screen" | "battery" | "water" | "charging" | "camera" | "software" | "accessories";
   className?: string;
 }) {
   return (
