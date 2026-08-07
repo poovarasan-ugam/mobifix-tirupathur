@@ -4,13 +4,16 @@ import ProductCard from "@/components/ProductCard";
 import PromoBanner from "@/components/PromoBanner";
 import Reveal from "@/components/motion/Reveal";
 import Parallax from "@/components/motion/Parallax";
+import RepairIcon from "@/components/RepairIcon";
 
 const services = [
-  { code: "SCR-01", label: "Screen Replacement", desc: "Cracked or dead display, fixed on-site." },
-  { code: "BAT-02", label: "Battery Replacement", desc: "Draining fast? Swapped in under 30 min." },
-  { code: "WTR-03", label: "Water Damage", desc: "Diagnosis & board-level cleaning." },
-  { code: "CHG-04", label: "Charging Port", desc: "Loose or dead port, repaired at your door." },
+  { code: "SCR-01", icon: "screen" as const, label: "Screen Replacement", desc: "Cracked or dead display, fixed on-site." },
+  { code: "BAT-02", icon: "battery" as const, label: "Battery Replacement", desc: "Draining fast? Swapped in under 30 min." },
+  { code: "WTR-03", icon: "water" as const, label: "Water Damage", desc: "Diagnosis & board-level cleaning." },
+  { code: "CHG-04", icon: "charging" as const, label: "Charging Port", desc: "Loose or dead port, repaired at your door." },
 ];
+
+const brands = ["Samsung", "Apple", "Xiaomi", "Vivo", "Oppo", "Realme", "OnePlus", "Motorola"];
 
 export const revalidate = 60;
 
@@ -82,6 +85,23 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ---- Brand trust strip ---- */}
+      <Reveal className="mx-auto max-w-6xl px-5 pb-16">
+        <p className="text-center text-xs uppercase tracking-wider text-muted mb-5">
+          We repair all major brands
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+          {brands.map((b) => (
+            <span
+              key={b}
+              className="font-display text-lg font-bold text-muted/70 transition hover:text-ink"
+            >
+              {b}
+            </span>
+          ))}
+        </div>
+      </Reveal>
+
       <PromoBanner />
 
       {/* ---- Services grid, styled as ticket stubs ---- */}
@@ -91,8 +111,11 @@ export default async function Home() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((s, i) => (
             <Reveal key={s.code} delay={i * 0.06} className="ticket p-5 mt-4">
-              <p className="ticket-number">{s.code}</p>
-              <p className="mt-3 font-display font-bold">{s.label}</p>
+              <div className="h-11 w-11 rounded-full bg-circuit/10 text-circuit flex items-center justify-center">
+                <RepairIcon kind={s.icon} />
+              </div>
+              <p className="ticket-number mt-3">{s.code}</p>
+              <p className="mt-2 font-display font-bold">{s.label}</p>
               <p className="mt-1 text-sm text-muted">{s.desc}</p>
             </Reveal>
           ))}
