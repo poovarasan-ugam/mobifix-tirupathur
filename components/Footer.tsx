@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PHONE_NUMBER, WHATSAPP_NUMBER } from "@/lib/contact";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -28,8 +29,8 @@ export default function Footer() {
         <div>
           <p className="text-sm font-semibold">Support</p>
           <div className="mt-3 flex flex-col gap-2 text-sm text-muted">
-            <a href="tel:+910000000000" className="hover:text-ink">Call us</a>
-            <a href="https://wa.me/910000000000" target="_blank" className="hover:text-circuit">
+            <a href={`tel:${PHONE_NUMBER}`} className="hover:text-ink">Call us</a>
+            <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" className="hover:text-circuit">
               WhatsApp
             </a>
           </div>
