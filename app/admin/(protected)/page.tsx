@@ -47,7 +47,7 @@ export default function AdminPage() {
             <p className="text-sm text-muted mt-1">Manage suppliers you source products from</p>
           </Link>
         )}
-        {role === "owner" && (
+        {permissions.testimonials && (
           <Link href="/admin/testimonials" className="ticket p-6 mt-4 block hover:border-circuit">
             <p className="font-display font-bold text-lg">Testimonials</p>
             <p className="text-sm text-muted mt-1">Add real customer reviews to show on the site</p>

@@ -7,7 +7,12 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 
 export type AdminRole = "owner" | "subadmin";
-export type AdminPermissions = { products: boolean; shops: boolean; bookings: boolean };
+export type AdminPermissions = {
+  products: boolean;
+  shops: boolean;
+  bookings: boolean;
+  testimonials: boolean;
+};
 
 type AdminContextType = { user: User; role: AdminRole; permissions: AdminPermissions };
 
@@ -43,11 +48,12 @@ export default function AdminGuard({ children }: { children: ReactNode }) {
         const perms = data.permissions ?? {};
         const permissions: AdminPermissions =
           role === "owner"
-            ? { products: true, shops: true, bookings: true }
+            ? { products: true, shops: true, bookings: true, testimonials: true }
             : {
                 products: perms.products ?? true,
                 shops: perms.shops ?? true,
                 bookings: perms.bookings ?? true,
+                testimonials: perms.testimonials ?? true,
               };
         setState({ user: u, role, permissions });
       } catch {

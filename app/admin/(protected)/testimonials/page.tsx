@@ -35,13 +35,13 @@ const EMPTY_FORM = {
 };
 
 export default function AdminTestimonialsPage() {
-  const { role } = useAdmin();
+  const { permissions } = useAdmin();
 
-  if (role !== "owner") {
+  if (!permissions.testimonials) {
     return (
       <div className="mx-auto max-w-2xl px-5 py-14">
         <h1 className="font-display text-3xl font-bold mb-2">Testimonials</h1>
-        <p className="text-muted">Only the owner account can manage testimonials.</p>
+        <p className="text-muted">You don&apos;t have access to this section.</p>
       </div>
     );
   }

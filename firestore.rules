@@ -65,11 +65,10 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
-    // Customer testimonials — public read, owner-only write (real reviews
-    // the owner has actually collected, not a sub-admin permission area).
+    // Customer testimonials — public read, admins with "testimonials" permission can manage.
     match /testimonials/{testimonialId} {
       allow read: if true;
-      allow write: if isOwner();
+      allow write: if hasPermission('testimonials');
     }
   }
 }

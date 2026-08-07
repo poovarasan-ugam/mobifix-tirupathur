@@ -6,16 +6,22 @@ import { db } from "@/lib/firebase";
 import { useAdmin } from "@/components/AdminGuard";
 import toast from "react-hot-toast";
 
-type Permissions = { products: boolean; shops: boolean; bookings: boolean };
+type Permissions = { products: boolean; shops: boolean; bookings: boolean; testimonials: boolean };
 type AdminRow = { email: string; role: "owner" | "subadmin"; permissions: Permissions };
 
 const PERMISSION_AREAS: { key: keyof Permissions; label: string }[] = [
   { key: "products", label: "Products" },
   { key: "shops", label: "Shops" },
   { key: "bookings", label: "Bookings" },
+  { key: "testimonials", label: "Testimonials" },
 ];
 
-const ALL_PERMISSIONS: Permissions = { products: true, shops: true, bookings: true };
+const ALL_PERMISSIONS: Permissions = {
+  products: true,
+  shops: true,
+  bookings: true,
+  testimonials: true,
+};
 
 export default function AdminAdminsPage() {
   const { user, role } = useAdmin();
@@ -53,6 +59,7 @@ function AdminsManager({ currentEmail }: { currentEmail: string }) {
             products: perms.products ?? true,
             shops: perms.shops ?? true,
             bookings: perms.bookings ?? true,
+            testimonials: perms.testimonials ?? true,
           },
         };
       })
