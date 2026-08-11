@@ -15,7 +15,7 @@ export default function Navbar() {
           Mobi<span className="text-amber">Fix</span>
         </Link>
         <div className="hidden gap-8 md:flex">
-          <Link href="/shop" className="text-sm text-muted hover:text-ink">
+          <Link href="/shop" className="text-sm font-semibold text-ink hover:text-amber">
             Shop
           </Link>
           <Link href="/repair" className="text-sm text-muted hover:text-ink">

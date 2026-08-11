@@ -39,13 +39,59 @@ const paths: Record<string, JSX.Element> = {
       <rect x="5" y="11" width="18" height="16" rx="3" />
     </>
   ),
+  case: (
+    <>
+      <rect x="9" y="3" width="14" height="26" rx="4.5" />
+      <circle cx="16" cy="8.5" r="1.4" fill="currentColor" stroke="none" />
+    </>
+  ),
+  earphones: (
+    <>
+      <path d="M7 16 Q7 5 16 5 Q25 5 25 16" strokeLinecap="round" />
+      <rect x="4" y="16" width="6" height="9" rx="2.5" />
+      <rect x="22" y="16" width="6" height="9" rx="2.5" />
+    </>
+  ),
+  cable: (
+    <>
+      <path d="M6 8 Q16 8 16 16 Q16 24 26 24" strokeLinecap="round" />
+      <rect x="2.5" y="5" width="7" height="6" rx="1.8" />
+      <rect x="22.5" y="21" width="7" height="6" rx="1.8" />
+    </>
+  ),
+  powerbank: (
+    <>
+      <rect x="8" y="3" width="16" height="26" rx="3" />
+      <path d="M18 9 L13 16 L16 16 L14 23 L20 15 L17 15 Z" strokeLinejoin="round" />
+    </>
+  ),
+  protector: (
+    <>
+      <rect x="7" y="3" width="18" height="26" rx="4" />
+      <path d="M11.5 9 L15.5 15" strokeLinecap="round" opacity="0.6" />
+    </>
+  ),
 };
+
+export type RepairIconKind =
+  | "screen"
+  | "battery"
+  | "water"
+  | "charging"
+  | "camera"
+  | "software"
+  | "accessories"
+  | "case"
+  | "earphones"
+  | "cable"
+  | "powerbank"
+  | "protector";
 
 export default function RepairIcon({
   kind,
   className,
 }: {
-  kind: "screen" | "battery" | "water" | "charging" | "camera" | "software" | "accessories";
+  kind: RepairIconKind;
   className?: string;
 }) {
   return (

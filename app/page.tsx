@@ -10,42 +10,50 @@ import FeatureIcon from "@/components/FeatureIcon";
 import SearchBar from "@/components/SearchBar";
 import Testimonials from "@/components/Testimonials";
 
-const categories = [
-  { icon: "screen" as const, label: "Screen Replacement", href: "/repair/book", color: "#F5A623" },
-  { icon: "battery" as const, label: "Battery", href: "/repair/book", color: "#10B981" },
-  { icon: "charging" as const, label: "Charging Port", href: "/repair/book", color: "#4F46E5" },
-  { icon: "water" as const, label: "Water Damage", href: "/repair/book", color: "#06B6D4" },
-  { icon: "camera" as const, label: "Camera", href: "/repair/book", color: "#8B5CF6" },
-  { icon: "software" as const, label: "Software Issues", href: "/repair/book", color: "#F97316" },
-  { icon: "accessories" as const, label: "Accessories", href: "/shop", color: "#EC4899" },
+const shopCategories = [
+  { icon: "case" as const, label: "Phone Cases", q: "case", color: "#EC4899" },
+  { icon: "charging" as const, label: "Chargers", q: "charger", color: "#4F46E5" },
+  { icon: "earphones" as const, label: "Earphones", q: "earphone", color: "#10B981" },
+  { icon: "protector" as const, label: "Screen Protectors", q: "protector", color: "#F5A623" },
+  { icon: "cable" as const, label: "Cables", q: "cable", color: "#06B6D4" },
+  { icon: "powerbank" as const, label: "Power Banks", q: "power bank", color: "#8B5CF6" },
+];
+
+const repairCategories = [
+  { icon: "screen" as const, label: "Screen Replacement" },
+  { icon: "battery" as const, label: "Battery" },
+  { icon: "charging" as const, label: "Charging Port" },
+  { icon: "water" as const, label: "Water Damage" },
+  { icon: "camera" as const, label: "Camera" },
+  { icon: "software" as const, label: "Software Issues" },
 ];
 
 const brands = ["Samsung", "Apple", "Xiaomi", "Vivo", "Oppo", "Realme", "OnePlus", "Motorola"];
 
 const whyUs = [
   {
+    icon: "genuine" as const,
+    label: "Genuine Products",
+    desc: "Every case, charger, and accessory we sell is genuine — never a cheap knockoff that fails in a few weeks.",
+    image: "https://images.unsplash.com/photo-1573739022854-abceaeb585dc?w=800&q=80&auto=format&fit=crop",
+  },
+  {
     icon: "doorstep" as const,
-    label: "Doorstep Service",
-    desc: "No need to visit a shop or wait in line. Our technician comes straight to your home or office with all the tools and parts needed, so your day isn't interrupted.",
+    label: "Doorstep Delivery",
+    desc: "Order online and get it delivered straight to your home or office across Tirupathur — no shop visit needed.",
     image: "https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=800&q=80&auto=format&fit=crop",
   },
   {
     icon: "certified" as const,
     label: "Certified Technicians",
-    desc: "Every repair is handled by a trained specialist who knows your device inside out — not a guess-and-check job. You get it fixed right the first time.",
+    desc: "Need a repair too? Every job is handled by a trained specialist who knows your device inside out.",
     image: "https://images.unsplash.com/photo-1611396000732-f8c9a933424f?w=800&q=80&auto=format&fit=crop",
   },
   {
     icon: "inspection" as const,
     label: "Free Inspection",
-    desc: "Before any work begins, we run a full diagnostic and give you a clear, fixed quote. No surprise charges, no pressure to say yes.",
+    desc: "Before any repair work begins, we run a full diagnostic and give you a clear, fixed quote — no surprises.",
     image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80&auto=format&fit=crop",
-  },
-  {
-    icon: "genuine" as const,
-    label: "Genuine Accessories",
-    desc: "Every case, charger, and part we sell or fit is genuine — never a cheap knockoff that fails in a few weeks.",
-    image: "https://images.unsplash.com/photo-1573739022854-abceaeb585dc?w=800&q=80&auto=format&fit=crop",
   },
 ];
 
@@ -65,34 +73,35 @@ export default async function Home() {
   const testimonials = await getTestimonials();
   return (
     <div>
+      {/* ---- Hero ---- */}
       <section className="mx-auto max-w-6xl px-5 pt-16 pb-14 md:pt-24">
         <div className="grid gap-10 md:grid-cols-2 md:items-center">
           <Reveal>
             <span className="inline-block rounded-full border border-line px-3 py-1 text-xs text-circuit font-mono">
-              Serving Tirupathur district
+              Delivering across Tirupathur district
             </span>
             <h1 className="mt-5 font-display text-4xl md:text-5xl font-bold leading-tight">
-              We come to you.
+              Genuine mobile accessories,
               <br />
-              Your phone doesn&apos;t.
+              delivered to your door.
             </h1>
             <p className="mt-4 text-muted max-w-md">
-              MobiFix sends a certified technician to your doorstep for
-              phone repairs, and delivers genuine accessories straight to
-              your home — no shop visit needed.
+              Cases, chargers, earphones, cables &amp; more — genuine
+              products delivered fast across Tirupathur. Need a repair too?
+              We do doorstep phone repair as well.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
-                href="/repair/book"
+                href="/shop"
                 className="rounded-md bg-amber px-6 py-3 font-semibold text-ink transition hover:brightness-110 hover:-translate-y-0.5 active:scale-95"
               >
-                Book a Repair
+                Shop Now
               </Link>
               <Link
-                href="/shop"
+                href="/repair/book"
                 className="rounded-md border border-line px-6 py-3 font-semibold text-ink transition hover:border-circuit hover:text-circuit hover:-translate-y-0.5 active:scale-95"
               >
-                Shop Accessories
+                Book a Repair
               </Link>
             </div>
           </Reveal>
@@ -102,8 +111,8 @@ export default async function Home() {
             <Reveal delay={0.15} className="relative mt-6">
               <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1639776738932-956082f0b704?w=1200&q=80&auto=format&fit=crop"
-                  alt="Technician repairing a smartphone"
+                  src="https://images.unsplash.com/photo-1628911771814-5d61388efbf7?w=1200&q=80&auto=format&fit=crop"
+                  alt="Genuine mobile accessories — earphones and phone"
                   fill
                   priority
                   className="object-cover"
@@ -113,8 +122,8 @@ export default async function Home() {
                     <FeatureIcon kind="doorstep" className="h-4 w-4" />
                   </span>
                   <div>
-                    <p className="text-xs font-semibold leading-none">Doorstep Service</p>
-                    <p className="text-[11px] text-muted mt-1">We come to you</p>
+                    <p className="text-xs font-semibold leading-none">Free Doorstep Delivery</p>
+                    <p className="text-[11px] text-muted mt-1">Across Tirupathur</p>
                   </div>
                 </div>
                 <div className="absolute bottom-4 left-4 ticket px-4 py-2.5 flex items-center gap-2.5 shadow-lg">
@@ -122,7 +131,7 @@ export default async function Home() {
                     <FeatureIcon kind="genuine" className="h-4 w-4" />
                   </span>
                   <div>
-                    <p className="text-xs font-semibold leading-none">Genuine Parts</p>
+                    <p className="text-xs font-semibold leading-none">Genuine Products</p>
                     <p className="text-[11px] text-muted mt-1">Never knockoffs</p>
                   </div>
                 </div>
@@ -133,91 +142,6 @@ export default async function Home() {
       </section>
 
       <SearchBar />
-
-      {/* ---- Brand trust strip ---- */}
-      <Reveal className="mx-auto max-w-6xl px-5 pb-16">
-        <p className="text-center text-xs uppercase tracking-wider text-muted mb-5">
-          We repair all major brands
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          {brands.map((b) => (
-            <span
-              key={b}
-              className="rounded-lg border border-line bg-surface px-5 py-2.5 font-display text-sm font-bold text-muted transition hover:-translate-y-0.5 hover:border-circuit hover:text-circuit hover:shadow-md"
-            >
-              {b}
-            </span>
-          ))}
-        </div>
-      </Reveal>
-
-      <PromoBanner />
-
-      {/* ---- Category grid ---- */}
-      <section className="mx-auto max-w-6xl px-5 pb-24">
-        <h2 className="font-display text-2xl font-bold mb-2">What do you need?</h2>
-        <p className="text-muted mb-8">Pick a category to get started — fixed pricing, quoted before we start.</p>
-        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-          {categories.map((c, i) => (
-            <Reveal key={c.label} delay={i * 0.05}>
-              <Link
-                href={c.href}
-                className="flex flex-col items-center gap-3 rounded-xl border border-line bg-surface p-5 text-center transition hover:-translate-y-1 hover:shadow-lg hover:border-transparent"
-              >
-                <div
-                  className="flex h-14 w-14 items-center justify-center rounded-full"
-                  style={{ backgroundColor: `${c.color}1A`, color: c.color }}
-                >
-                  <RepairIcon kind={c.icon} />
-                </div>
-                <p className="font-display font-semibold text-sm">{c.label}</p>
-              </Link>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      {/* ---- Why choose MobiFix ---- */}
-      <section className="mx-auto max-w-6xl px-5 pb-24">
-        <h2 className="font-display text-2xl font-bold mb-2">Why choose MobiFix</h2>
-        <p className="text-muted mb-8">What you get with every visit.</p>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {whyUs.map((f, i) => (
-            <Reveal key={f.label} delay={i * 0.06} className="ticket mt-4">
-              <div className="relative aspect-[4/3] w-full bg-surface2">
-                <Image src={f.image} alt={f.label} fill className="object-cover" />
-                <div className="absolute -bottom-5 left-4 h-11 w-11 rounded-full bg-amber/15 text-amber flex items-center justify-center ring-4 ring-surface">
-                  <FeatureIcon kind={f.icon} />
-                </div>
-              </div>
-              <div className="p-5 pt-7">
-                <p className="font-display font-bold">{f.label}</p>
-                <p className="mt-1.5 text-sm text-muted leading-relaxed">{f.desc}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      {/* ---- Booking process timeline ---- */}
-      <section className="mx-auto max-w-6xl px-5 pb-24">
-        <h2 className="font-display text-2xl font-bold mb-2">How booking works</h2>
-        <p className="text-muted mb-10">From tap to fixed, in five steps.</p>
-        <div className="relative">
-          <div className="hidden md:block absolute top-6 left-[10%] right-[10%] h-0.5 bg-line" />
-          <div className="grid gap-8 md:grid-cols-5">
-            {bookingSteps.map((s, i) => (
-              <Reveal key={s.label} delay={i * 0.08} className="relative flex flex-col items-center text-center">
-                <div className="h-12 w-12 rounded-full bg-circuit text-white flex items-center justify-center font-display font-bold relative z-10">
-                  {i + 1}
-                </div>
-                <p className="mt-3 font-semibold text-sm">{s.label}</p>
-                <p className="mt-1 text-xs text-muted">{s.desc}</p>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {featured.length > 0 && (
         <section className="mx-auto max-w-6xl px-5 pb-24">
@@ -240,6 +164,122 @@ export default async function Home() {
         </section>
       )}
 
+      {/* ---- Shop by category ---- */}
+      <section className="mx-auto max-w-6xl px-5 pb-24">
+        <h2 className="font-display text-2xl font-bold mb-2">Shop by category</h2>
+        <p className="text-muted mb-8">Genuine accessories for every phone.</p>
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+          {shopCategories.map((c, i) => (
+            <Reveal key={c.label} delay={i * 0.05}>
+              <Link
+                href={`/shop?q=${encodeURIComponent(c.q)}`}
+                className="flex flex-col items-center gap-3 rounded-xl border border-line bg-surface p-5 text-center transition hover:-translate-y-1 hover:shadow-lg hover:border-transparent"
+              >
+                <div
+                  className="flex h-14 w-14 items-center justify-center rounded-full"
+                  style={{ backgroundColor: `${c.color}1A`, color: c.color }}
+                >
+                  <RepairIcon kind={c.icon} />
+                </div>
+                <p className="font-display font-semibold text-sm">{c.label}</p>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ---- Brand trust strip ---- */}
+      <Reveal className="mx-auto max-w-6xl px-5 pb-16">
+        <p className="text-center text-xs uppercase tracking-wider text-muted mb-5">
+          Accessories &amp; repairs for all major brands
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {brands.map((b) => (
+            <span
+              key={b}
+              className="rounded-lg border border-line bg-surface px-5 py-2.5 font-display text-sm font-bold text-muted transition hover:-translate-y-0.5 hover:border-circuit hover:text-circuit hover:shadow-md"
+            >
+              {b}
+            </span>
+          ))}
+        </div>
+      </Reveal>
+
+      <PromoBanner />
+
+      {/* ---- Why choose MobiFix ---- */}
+      <section className="mx-auto max-w-6xl px-5 pb-24">
+        <h2 className="font-display text-2xl font-bold mb-2">Why choose MobiFix</h2>
+        <p className="text-muted mb-8">What you get with every order.</p>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {whyUs.map((f, i) => (
+            <Reveal key={f.label} delay={i * 0.06} className="ticket mt-4">
+              <div className="relative aspect-[4/3] w-full bg-surface2">
+                <Image src={f.image} alt={f.label} fill className="object-cover" />
+                <div className="absolute -bottom-5 left-4 h-11 w-11 rounded-full bg-amber/15 text-amber flex items-center justify-center ring-4 ring-surface">
+                  <FeatureIcon kind={f.icon} />
+                </div>
+              </div>
+              <div className="p-5 pt-7">
+                <p className="font-display font-bold">{f.label}</p>
+                <p className="mt-1.5 text-sm text-muted leading-relaxed">{f.desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ---- Repair services (secondary) ---- */}
+      <section className="mx-auto max-w-6xl px-5 pb-24">
+        <div className="ticket p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <span className="ticket-number">ALSO AVAILABLE</span>
+              <h2 className="mt-2 font-display text-xl font-bold">Need a repair instead?</h2>
+              <p className="mt-1 text-sm text-muted">
+                Doorstep phone repair — free inspection, fixed pricing.
+              </p>
+            </div>
+            <Link
+              href="/repair/book"
+              className="shrink-0 rounded-md bg-amber px-6 py-2.5 font-semibold text-ink transition hover:brightness-110 hover:-translate-y-0.5 active:scale-95"
+            >
+              Book a Repair
+            </Link>
+          </div>
+          <div className="grid gap-4 grid-cols-3 sm:grid-cols-6 mt-8">
+            {repairCategories.map((c) => (
+              <div key={c.label} className="flex flex-col items-center gap-2 text-center">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-circuit/10 text-circuit">
+                  <RepairIcon kind={c.icon} className="h-5 w-5" />
+                </div>
+                <p className="text-xs text-muted">{c.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---- Booking process timeline ---- */}
+      <section className="mx-auto max-w-6xl px-5 pb-24">
+        <h2 className="font-display text-2xl font-bold mb-2">How repair booking works</h2>
+        <p className="text-muted mb-10">From tap to fixed, in five steps.</p>
+        <div className="relative">
+          <div className="hidden md:block absolute top-6 left-[10%] right-[10%] h-0.5 bg-line" />
+          <div className="grid gap-8 md:grid-cols-5">
+            {bookingSteps.map((s, i) => (
+              <Reveal key={s.label} delay={i * 0.08} className="relative flex flex-col items-center text-center">
+                <div className="h-12 w-12 rounded-full bg-circuit text-white flex items-center justify-center font-display font-bold relative z-10">
+                  {i + 1}
+                </div>
+                <p className="mt-3 font-semibold text-sm">{s.label}</p>
+                <p className="mt-1 text-xs text-muted">{s.desc}</p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <Testimonials testimonials={testimonials} />
 
       {/* ---- Coverage ---- */}
@@ -249,12 +289,12 @@ export default async function Home() {
             <span className="ticket-number">SERVICE AREA</span>
             <h2 className="mt-2 font-display text-2xl font-bold">Currently serving Tirupathur &amp; nearby areas</h2>
             <p className="mt-3 text-muted">
-              Our technicians cover Tirupathur town and the surrounding
-              district. Tell us your locality when you book — we&apos;ll
-              confirm coverage and an arrival time.
+              We deliver accessories and offer doorstep repair across
+              Tirupathur town and the surrounding district. Tell us your
+              locality at checkout or booking — we&apos;ll confirm coverage.
             </p>
             <Link
-              href="/repair/book"
+              href="/shop"
               className="mt-6 inline-block rounded-md border border-line px-5 py-2.5 font-semibold text-sm text-ink transition hover:border-circuit hover:text-circuit"
             >
               Check availability →
@@ -282,14 +322,14 @@ export default async function Home() {
           style={{ background: "linear-gradient(135deg, #F5A623, #4F46E5)" }}
         >
           <h2 className="font-display text-2xl md:text-3xl font-bold text-white">
-            Need your phone fixed today?
+            Genuine accessories, delivered fast.
           </h2>
-          <p className="mt-2 text-white/90">Book a technician in under 2 minutes.</p>
+          <p className="mt-2 text-white/90">Browse cases, chargers, earphones &amp; more.</p>
           <Link
-            href="/repair/book"
+            href="/shop"
             className="mt-6 inline-block rounded-md bg-white px-8 py-3 font-semibold text-ink transition hover:brightness-95 hover:-translate-y-0.5 active:scale-95"
           >
-            Book Now
+            Shop Now
           </Link>
         </Reveal>
       </section>
