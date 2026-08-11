@@ -7,7 +7,6 @@ import Reveal from "@/components/motion/Reveal";
 import Parallax from "@/components/motion/Parallax";
 import RepairIcon from "@/components/RepairIcon";
 import FeatureIcon from "@/components/FeatureIcon";
-import SearchBar from "@/components/SearchBar";
 import Testimonials from "@/components/Testimonials";
 
 const shopCategories = [
@@ -140,8 +139,6 @@ export default async function Home() {
           </Parallax>
         </div>
       </section>
-
-      <SearchBar />
 
       {featured.length > 0 && (
         <section className="mx-auto max-w-6xl px-5 pb-24">
