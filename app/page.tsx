@@ -8,6 +8,7 @@ import Parallax from "@/components/motion/Parallax";
 import RepairIcon from "@/components/RepairIcon";
 import FeatureIcon from "@/components/FeatureIcon";
 import Testimonials from "@/components/Testimonials";
+import HeroShowcase from "@/components/HeroShowcase";
 
 const shopCategories = [
   { icon: "case" as const, label: "Phone Cases", q: "case", color: "#EC4899" },
@@ -105,36 +106,10 @@ export default async function Home() {
             </div>
           </Reveal>
 
-          {/* hero visual */}
+          {/* hero visual: live product showcase */}
           <Parallax strength={18}>
-            <Reveal delay={0.15} className="relative mt-6">
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-xl">
-                <Image
-                  src="https://images.unsplash.com/photo-1628911771814-5d61388efbf7?w=1200&q=80&auto=format&fit=crop"
-                  alt="Genuine mobile accessories — earphones and phone"
-                  fill
-                  priority
-                  className="object-cover"
-                />
-                <div className="absolute top-4 right-4 ticket px-4 py-2.5 flex items-center gap-2.5 shadow-lg">
-                  <span className="h-8 w-8 shrink-0 rounded-full bg-circuit/10 text-circuit flex items-center justify-center">
-                    <FeatureIcon kind="doorstep" className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <p className="text-xs font-semibold leading-none">Free Doorstep Delivery</p>
-                    <p className="text-[11px] text-muted mt-1">Across Tirupathur</p>
-                  </div>
-                </div>
-                <div className="absolute bottom-4 left-4 ticket px-4 py-2.5 flex items-center gap-2.5 shadow-lg">
-                  <span className="h-8 w-8 shrink-0 rounded-full bg-amber/15 text-amber flex items-center justify-center">
-                    <FeatureIcon kind="genuine" className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <p className="text-xs font-semibold leading-none">Genuine Products</p>
-                    <p className="text-[11px] text-muted mt-1">Never knockoffs</p>
-                  </div>
-                </div>
-              </div>
+            <Reveal delay={0.15} className="mt-6">
+              <HeroShowcase products={featured} />
             </Reveal>
           </Parallax>
         </div>
