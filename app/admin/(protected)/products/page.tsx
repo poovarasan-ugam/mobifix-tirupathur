@@ -116,16 +116,27 @@ function ProductsManager() {
   }, []);
 
   async function handlePhotosChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []).slice(0, MAX_PHOTOS);
-    photoPreviews.forEach((url) => URL.revokeObjectURL(url));
-    setPhotoFiles([]);
-    setPhotoPreviews([]);
-    if (files.length === 0) return;
+    const newFiles = Array.from(e.target.files ?? []);
+    // Reset the input's value so the same input can be triggered again —
+    // needed because the camera only returns one photo per tap, and the
+    // admin needs to be able to tap it again to add more.
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (newFiles.length === 0) return;
+
+    const room = MAX_PHOTOS - photoFiles.length;
+    if (room <= 0) {
+      toast.error(`You can add up to ${MAX_PHOTOS} photos`);
+      return;
+    }
+    const filesToAdd = newFiles.slice(0, room);
+    if (newFiles.length > filesToAdd.length) {
+      toast.error(`Only added ${filesToAdd.length} — that's the ${MAX_PHOTOS}-photo limit`);
+    }
 
     setEnhancing(true);
     try {
       const enhanced = await Promise.all(
-        files.map(async (file) => {
+        filesToAdd.map(async (file) => {
           try {
             return await enhanceProductPhoto(file);
           } catch (err) {
@@ -135,8 +146,8 @@ function ProductsManager() {
           }
         })
       );
-      setPhotoFiles(enhanced);
-      setPhotoPreviews(enhanced.map((f) => URL.createObjectURL(f)));
+      setPhotoFiles((prev) => [...prev, ...enhanced]);
+      setPhotoPreviews((prev) => [...prev, ...enhanced.map((f) => URL.createObjectURL(f))]);
     } finally {
       setEnhancing(false);
     }
@@ -372,7 +383,8 @@ function ProductsManager() {
           </label>
           <p className="text-xs text-muted mt-0.5">
             Each photo is auto-cropped onto a clean white background and brightness-balanced.
-            On a phone, this lets you take a photo directly or pick from your gallery.
+            On a phone, the camera only captures one photo at a time — tap
+            &ldquo;Choose Files&rdquo; again after each shot to add more, up to {MAX_PHOTOS}.
           </p>
           <input
             ref={fileInputRef}
