@@ -128,7 +128,9 @@ function ProductsManager() {
         files.map(async (file) => {
           try {
             return await enhanceProductPhoto(file);
-          } catch {
+          } catch (err) {
+            console.error("Photo enhancement failed, using original photo:", err);
+            toast.error(`Couldn't auto-enhance "${file.name}" — using the original photo instead`);
             return file; // fall back to the original if enhancement fails
           }
         })

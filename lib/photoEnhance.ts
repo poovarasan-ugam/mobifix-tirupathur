@@ -4,6 +4,9 @@
 // brightness/contrast. Works best on plain/uniform backgrounds; on busy
 // backgrounds it degrades gracefully to a looser crop rather than failing.
 
+const WORKING_MAX_DIM = 1600; // cap source resolution before any canvas work —
+// camera photos can be 12MP+, and mobile browsers have canvas size/memory
+// limits that raw camera resolution can exceed.
 const ANALYSIS_MAX_DIM = 400;
 const OUTPUT_SIZE = 1200;
 const CORNER_PATCH = 14;
@@ -15,7 +18,7 @@ function loadImage(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
-    img.onerror = reject;
+    img.onerror = () => reject(new Error("Image failed to load"));
     img.src = URL.createObjectURL(file);
   });
 }
@@ -73,8 +76,8 @@ function findForegroundBox(
   return {
     x,
     y,
-    width: Math.min(width, maxX - minX + pad * 2),
-    height: Math.min(height, maxY - minY + pad * 2),
+    width: Math.min(width - x, maxX - minX + pad * 2),
+    height: Math.min(height - y, maxY - minY + pad * 2),
   };
 }
 
@@ -95,36 +98,62 @@ function autoLevels(imageData: ImageData) {
   }
 }
 
+function canvasToImageData(canvas: HTMLCanvasElement): ImageData {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas 2D context unavailable");
+  return ctx.getImageData(0, 0, canvas.width, canvas.height);
+}
+
 export async function enhanceProductPhoto(file: File): Promise<File> {
   const img = await loadImage(file);
-  const { naturalWidth: width, naturalHeight: height } = img;
+  const { naturalWidth, naturalHeight } = img;
+  if (!naturalWidth || !naturalHeight) {
+    URL.revokeObjectURL(img.src);
+    throw new Error("Image has no dimensions");
+  }
+
+  // 0. Downscale to a safe working resolution first, before any pixel-level
+  // work — this is what makes large camera photos reliable across devices.
+  const workingScale = Math.min(1, WORKING_MAX_DIM / Math.max(naturalWidth, naturalHeight));
+  const workingCanvas = document.createElement("canvas");
+  workingCanvas.width = Math.max(1, Math.round(naturalWidth * workingScale));
+  workingCanvas.height = Math.max(1, Math.round(naturalHeight * workingScale));
+  const wctx = workingCanvas.getContext("2d");
+  if (!wctx) throw new Error("Canvas 2D context unavailable");
+  wctx.drawImage(img, 0, 0, workingCanvas.width, workingCanvas.height);
+  URL.revokeObjectURL(img.src);
+
+  const width = workingCanvas.width;
+  const height = workingCanvas.height;
 
   // 1. Downscaled analysis pass to find the crop box cheaply.
   const scale = Math.min(1, ANALYSIS_MAX_DIM / Math.max(width, height));
   const analysisCanvas = document.createElement("canvas");
-  analysisCanvas.width = Math.round(width * scale);
-  analysisCanvas.height = Math.round(height * scale);
-  const actx = analysisCanvas.getContext("2d")!;
-  actx.drawImage(img, 0, 0, analysisCanvas.width, analysisCanvas.height);
-  const analysisData = actx.getImageData(0, 0, analysisCanvas.width, analysisCanvas.height);
+  analysisCanvas.width = Math.max(1, Math.round(width * scale));
+  analysisCanvas.height = Math.max(1, Math.round(height * scale));
+  const actx = analysisCanvas.getContext("2d");
+  if (!actx) throw new Error("Canvas 2D context unavailable");
+  actx.drawImage(workingCanvas, 0, 0, analysisCanvas.width, analysisCanvas.height);
+  const analysisData = canvasToImageData(analysisCanvas);
   const bg = averageCornerColor(analysisData.data, analysisCanvas.width, analysisCanvas.height);
   const smallBox = findForegroundBox(analysisData.data, analysisCanvas.width, analysisCanvas.height, bg);
 
-  // 2. Scale the box back up to full resolution and crop.
+  // 2. Scale the box back up to the working resolution and crop.
   const box: Box = {
     x: Math.round(smallBox.x / scale),
     y: Math.round(smallBox.y / scale),
-    width: Math.round(smallBox.width / scale),
-    height: Math.round(smallBox.height / scale),
+    width: Math.max(1, Math.round(smallBox.width / scale)),
+    height: Math.max(1, Math.round(smallBox.height / scale)),
   };
   const cropCanvas = document.createElement("canvas");
   cropCanvas.width = box.width;
   cropCanvas.height = box.height;
-  const cctx = cropCanvas.getContext("2d")!;
-  cctx.drawImage(img, box.x, box.y, box.width, box.height, 0, 0, box.width, box.height);
+  const cctx = cropCanvas.getContext("2d");
+  if (!cctx) throw new Error("Canvas 2D context unavailable");
+  cctx.drawImage(workingCanvas, box.x, box.y, box.width, box.height, 0, 0, box.width, box.height);
 
   // 3. Auto-balance brightness/contrast on the cropped product.
-  const cropData = cctx.getImageData(0, 0, cropCanvas.width, cropCanvas.height);
+  const cropData = canvasToImageData(cropCanvas);
   autoLevels(cropData);
   cctx.putImageData(cropData, 0, 0);
 
@@ -132,7 +161,8 @@ export async function enhanceProductPhoto(file: File): Promise<File> {
   const outCanvas = document.createElement("canvas");
   outCanvas.width = OUTPUT_SIZE;
   outCanvas.height = OUTPUT_SIZE;
-  const octx = outCanvas.getContext("2d")!;
+  const octx = outCanvas.getContext("2d");
+  if (!octx) throw new Error("Canvas 2D context unavailable");
   octx.fillStyle = "#ffffff";
   octx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
 
@@ -148,8 +178,6 @@ export async function enhanceProductPhoto(file: File): Promise<File> {
     drawWidth,
     drawHeight
   );
-
-  URL.revokeObjectURL(img.src);
 
   const blob: Blob = await new Promise((resolve, reject) =>
     outCanvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), "image/jpeg", 0.92)
