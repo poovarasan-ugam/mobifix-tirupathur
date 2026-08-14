@@ -370,11 +370,13 @@ function ProductsManager() {
           </label>
           <p className="text-xs text-muted mt-0.5">
             Each photo is auto-cropped onto a clean white background and brightness-balanced.
+            On a phone, this lets you take a photo directly or pick from your gallery.
           </p>
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*"
+            capture="environment"
             multiple
             onChange={handlePhotosChange}
             disabled={enhancing}
