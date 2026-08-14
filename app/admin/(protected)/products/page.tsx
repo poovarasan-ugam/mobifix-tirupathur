@@ -14,6 +14,7 @@ import {
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
 import { useAdmin } from "@/components/AdminGuard";
+import { enhanceProductPhoto } from "@/lib/photoEnhance";
 import toast from "react-hot-toast";
 
 const MAX_PHOTOS = 4;
@@ -66,6 +67,7 @@ function ProductsManager() {
   const [shops, setShops] = useState<ShopOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [enhancing, setEnhancing] = useState(false);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -113,11 +115,29 @@ function ProductsManager() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function handlePhotosChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handlePhotosChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []).slice(0, MAX_PHOTOS);
     photoPreviews.forEach((url) => URL.revokeObjectURL(url));
-    setPhotoFiles(files);
-    setPhotoPreviews(files.map((f) => URL.createObjectURL(f)));
+    setPhotoFiles([]);
+    setPhotoPreviews([]);
+    if (files.length === 0) return;
+
+    setEnhancing(true);
+    try {
+      const enhanced = await Promise.all(
+        files.map(async (file) => {
+          try {
+            return await enhanceProductPhoto(file);
+          } catch {
+            return file; // fall back to the original if enhancement fails
+          }
+        })
+      );
+      setPhotoFiles(enhanced);
+      setPhotoPreviews(enhanced.map((f) => URL.createObjectURL(f)));
+    } finally {
+      setEnhancing(false);
+    }
   }
 
   function removePhoto(index: number) {
@@ -348,16 +368,24 @@ function ProductsManager() {
             Photos — add {MAX_PHOTOS} for best results
             {editingId && " (leave empty to keep existing photos)"}
           </label>
+          <p className="text-xs text-muted mt-0.5">
+            Each photo is auto-cropped onto a clean white background and brightness-balanced.
+          </p>
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*"
             multiple
             onChange={handlePhotosChange}
-            className="mt-1 w-full rounded border border-line bg-surface2 px-3 py-2 text-sm"
+            disabled={enhancing}
+            className="mt-1 w-full rounded border border-line bg-surface2 px-3 py-2 text-sm disabled:opacity-50"
           />
 
-          {editingId && photoPreviews.length === 0 && editingImages.length > 0 && (
+          {enhancing && (
+            <p className="text-xs text-circuit mt-2">Enhancing photos…</p>
+          )}
+
+          {editingId && photoPreviews.length === 0 && editingImages.length > 0 && !enhancing && (
             <div className="mt-3">
               <p className="text-xs text-muted mb-2">Current photos</p>
               <div className="flex gap-2 flex-wrap">
@@ -393,10 +421,12 @@ function ProductsManager() {
         <div className="flex gap-3">
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || enhancing}
             className="rounded-md bg-amber px-6 py-2.5 font-semibold text-ink transition hover:brightness-110 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0 disabled:active:scale-100"
           >
-            {uploading
+            {enhancing
+              ? "Enhancing photos…"
+              : uploading
               ? "Uploading photos…"
               : loading
               ? editingId
